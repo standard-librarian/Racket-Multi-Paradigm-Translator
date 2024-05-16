@@ -52,6 +52,7 @@ class TokenType(Enum):
     MAP = "MAP"
     FOLDL = "FOLDL"
     WRITELN = "WRITELN"
+    LIST = "LIST"
 
 
 class Token:
@@ -235,6 +236,8 @@ class Lexer:
                     self.tokens.append(Token(TokenType.FOLDL, identifier.upper()))
                 elif identifier.upper() == "WRITELN":
                     self.tokens.append(Token(TokenType.WRITELN, identifier.upper()))
+                elif identifier.upper() == "LIST":
+                    self.tokens.append(Token(TokenType.LIST, identifier.upper()))
                 else:
                     self.tokens.append(Token(TokenType.IDENTIFIER, identifier))
                 identifier = ""
@@ -313,6 +316,14 @@ class DefineNode(ASTNode):
     def generate_python_code(self):
         return f"{self.identifier.generate_python_code()} = {self.expr.generate_python_code()}"
 
+
+class ListNodes(ASTNode):
+    def __init__(self, elements):
+        self.elements = elements
+
+    def generate_python_code(self):
+        return f"list(({', '.join([element.generate_python_code() for element in self.elements])}))"
+    
 
 class LetDefinitionNode(ASTNode):
     def __init__(self, identifier, expr):
@@ -615,6 +626,8 @@ class Parser:
             return EqualNode(left, right)
         elif tok_type == TokenType.NUMBER:
             return self.number_expr()
+        elif tok_type == TokenType.LIST:
+            return self.list_expr()
         else:
             # Handle syntax errors or unsupported expressions
             pass
@@ -680,6 +693,14 @@ class Parser:
 
         return DefineNode(identifier, value)
 
+    def list_expr(self):
+        self.advance() # Skip 'list'
+        elements = []
+        while self.current_tok.type != TokenType.RPAREN:
+            elements.append(self.expr())
+        self.advance() # Skip ')'
+        return ListNodes(elements)
+
     def let_expr(self):
         self.advance()  # Skip 'let'
         self.advance()  # Skip '('
@@ -719,6 +740,7 @@ import sys
 
 def main(filename=None):
     lexer = Lexer()
+    print ("HI")
     if filename:
         with open(filename, 'r') as file:
             for line in file:
@@ -730,10 +752,11 @@ def main(filename=None):
                     print(python_code)
     else:
         while True:
-            text = input("racket >> ")
+            text = input("Racket >> ")
             if text == "exit":
                 break
             tokens = lexer.tokenize_line(text)
+            #print ("tokens = " , tokens)
             parser = Parser(tokens)
             ast = parser.parse()
             if ast:
