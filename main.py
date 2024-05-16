@@ -312,14 +312,131 @@ class LambdaNode(ASTNode):
 
 
 class MULTNode(ASTNode):
+    def __init__(self, operands):
+        self.operands = operands
+        print(self.operands)
+
+    def generate_python_code(self):
+        # mul_all((2, 5, 7))
+        output = "mul_all(("
+        for operand in self.operands:
+            if isinstance(operand, NumberNode):
+                output += f"{operand.value}, "
+            else:
+                output += operand.generate_python_code() + ", "
+        output = output[:-2]
+        output += "))"
+        return output
+
+    def __str__(self):
+        return f"MULTNode({self.operands})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class AddNode(ASTNode):
+    def __init__(self, operands):
+        self.operands = operands
+        print(self.operands)
+
+    def generate_python_code(self):
+        # add_all((2, 5, 7))
+        output = "add_all(("
+        for operand in self.operands:
+            if isinstance(operand, NumberNode):
+                output += f"{operand.value}, "
+            else:
+                output += operand.generate_python_code() + ", "
+
+        output = output[:-2]
+        output += "))"
+        return output
+
+    def __str__(self):
+        return f"AddNode({self.operands})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class SubNode(ASTNode):
+    def __init__(self, operands):
+        self.operands = operands
+        print(self.operands)
+
+    def generate_python_code(self):
+        # sub_all((2, 5, 7))
+        output = "sub_all(("
+        for operand in self.operands:
+            if isinstance(operand, NumberNode):
+                output += f"{operand.value}, "
+            else:
+                output += operand.generate_python_code() + ", "
+
+        output = output[:-2]
+        output += "))"
+        return output
+
+    def __str__(self):
+        return f"SubNode({self.operands})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class DivNode(ASTNode):
+    def __init__(self, operands):
+        self.operands = operands
+        print(self.operands)
+
+    def generate_python_code(self):
+        # div_all((2, 5, 7))
+        output = "div_all(("
+        for operand in self.operands:
+            if isinstance(operand, NumberNode):
+                output += f"{operand.value}, "
+            else:
+                output += operand.generate_python_code() + ", "
+        output = output[:-2]
+        output += "))"
+        return output
+
+    def __str__(self):
+        return f"DivNode({self.operands})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class IfNode(ASTNode):
+    def __init__(self, condition, true_branch, false_branch=None):
+        self.condition = condition
+        self.true_branch = true_branch
+        self.false_branch = false_branch
+
+    def generate_python_code(self):
+        if self.false_branch:
+            return f"({self.true_branch.generate_python_code()} if {self.condition.generate_python_code()} else {self.false_branch.generate_python_code()})"
+        else:
+            return f"({self.true_branch.generate_python_code()} if {self.condition.generate_python_code()} else None)"
+
+
+class CondNode(ASTNode):
+    def __init__(self, cases):
+        self.cases = cases
+
+    def generate_python_code(self):
+        return f"({next((expr.generate_python_code() for cond, expr in self.cases if cond), None)})"
+
+class EqualNode(ASTNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right
 
     def generate_python_code(self):
-        return (
-            f"{self.left.generate_python_code()} * {self.right.generate_python_code()}"
-        )
+        return f"({self.left.generate_python_code()} == {self.right.generate_python_code()})"
+
 
 
 class IfNode(ASTNode):
@@ -384,6 +501,12 @@ class Parser:
             return self.lambda_expr()
         elif tok_type == TokenType.PLUS:
             self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                expr = self.expr()
+                operands.append(expr)
+            return AddNode(operands)
+
             left = self.expr()
             right = self.expr()
             return MULTNode(left, right)
@@ -393,16 +516,22 @@ class Parser:
             return self.cond_expr()
         elif tok_type == TokenType.MINUS:
             self.advance()
-            left = self.expr()
-            right = self.expr()
-            return MULTNode(left, right)
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                operands.append(self.expr())
+            return SubNode(operands)
         elif tok_type == TokenType.MULTIPLY:
             self.advance()
-            left = self.expr()
-            right = self.expr()
-            return MULTNode(left, right)
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                operands.append(self.expr())
+            return MULTNode(operands)
         elif tok_type == TokenType.DIVIDE:
             self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                operands.append(self.expr())
+            return DivNode(operands)
             left = self.expr()
             right = self.expr()
             return MULTNode(left, right)
@@ -474,7 +603,6 @@ class Parser:
     def lambda_expr(self):
         self.advance()
         self.advance()
-        print(str(self.current_tok))
         params = []
         while self.current_tok.type != TokenType.RPAREN:
             identifier = self.identifier_expr()
