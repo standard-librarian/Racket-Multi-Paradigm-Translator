@@ -1,7 +1,23 @@
 import sys
+import os
 
-from lexar import Lexer
-from parser import Parser
+# SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+# sys.path.append(os.path.join(SCRIPT_DIR, "src"))
+
+
+from .lexer import Lexer
+from .parser import Parser
+
+
+def test_line(racket_line: str):
+    lexer = Lexer()
+    tokens = lexer.tokenize_line(racket_line)
+    parser = Parser(tokens)
+    ast = parser.parse()
+    python_code = None
+    if ast:
+        python_code = ast.generate_python_code()
+    return python_code
 
 
 def main(filename=None):
