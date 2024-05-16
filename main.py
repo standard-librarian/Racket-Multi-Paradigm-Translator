@@ -740,7 +740,6 @@ import sys
 
 def main(filename=None):
     lexer = Lexer()
-    print ("HI")
     if filename:
         with open(filename, 'r') as file:
             for line in file:
@@ -752,7 +751,7 @@ def main(filename=None):
                     print(python_code)
     else:
         while True:
-            text = input("Racket >> ")
+            text = input("racket >> ")
             if text == "exit":
                 break
             tokens = lexer.tokenize_line(text)
