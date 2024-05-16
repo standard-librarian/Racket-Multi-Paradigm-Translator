@@ -60,10 +60,8 @@ class Token:
 
 
 class Lexer:
-    def __init__(self, code):
-        self.code = code
+    def __init__(self):
         self.tokens = []
-        self.position = 0
 
     def advance(self):
         self.position += 1
@@ -105,8 +103,10 @@ class Lexer:
     def is_alphanumeric(self, char):
         return char.isalnum()
 
-    def tokenize(self):
-        code = self.code
+    def tokenize_line(self, line):
+        self.code = line
+        self.position = 0
+        self.tokens = []
         while not self.is_eof():
             char = self.peek()
             if self.is_whitespace(char):
@@ -608,21 +608,27 @@ class Parser:
 import sys
 
 def main(filename=None):
+    lexer = Lexer()
     if filename:
         with open(filename, 'r') as file:
-            text = file.read()
+            for line in file:
+                tokens = lexer.tokenize_line(line)
+                parser = Parser(tokens)
+                ast = parser.parse()
+                if ast:
+                    python_code = ast.generate_python_code()
+                    print(python_code)
     else:
         while True:
             text = input("racket >> ")
             if text == "exit":
                 break
-    lexer = Lexer(text)
-    tokens = lexer.tokenize()
-    parser = Parser(tokens)
-    ast = parser.parse()
-    if ast:
-        python_code = ast.generate_python_code()
-        print(python_code)
+            tokens = lexer.tokenize_line(text)
+            parser = Parser(tokens)
+            ast = parser.parse()
+            if ast:
+                python_code = ast.generate_python_code()
+                print(python_code)
 
 
 if __name__ == "__main__":
