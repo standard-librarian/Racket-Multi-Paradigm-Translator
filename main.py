@@ -314,7 +314,6 @@ class LambdaNode(ASTNode):
 class MULTNode(ASTNode):
     def __init__(self, operands):
         self.operands = operands
-        print(self.operands)
 
     def generate_python_code(self):
         # mul_all((2, 5, 7))
@@ -338,7 +337,6 @@ class MULTNode(ASTNode):
 class AddNode(ASTNode):
     def __init__(self, operands):
         self.operands = operands
-        print(self.operands)
 
     def generate_python_code(self):
         # add_all((2, 5, 7))
@@ -363,7 +361,6 @@ class AddNode(ASTNode):
 class SubNode(ASTNode):
     def __init__(self, operands):
         self.operands = operands
-        print(self.operands)
 
     def generate_python_code(self):
         # sub_all((2, 5, 7))
@@ -388,7 +385,6 @@ class SubNode(ASTNode):
 class DivNode(ASTNode):
     def __init__(self, operands):
         self.operands = operands
-        print(self.operands)
 
     def generate_python_code(self):
         # div_all((2, 5, 7))
@@ -506,10 +502,6 @@ class Parser:
                 expr = self.expr()
                 operands.append(expr)
             return AddNode(operands)
-
-            left = self.expr()
-            right = self.expr()
-            return MULTNode(left, right)
         elif tok_type == TokenType.IF:
             return self.if_expr()
         elif tok_type == TokenType.COND:
@@ -532,9 +524,6 @@ class Parser:
             while self.current_tok.type != TokenType.RPAREN:
                 operands.append(self.expr())
             return DivNode(operands)
-            left = self.expr()
-            right = self.expr()
-            return MULTNode(left, right)
         elif tok_type == TokenType.EQUAL:
             self.advance()
             left = self.expr()
