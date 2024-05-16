@@ -605,20 +605,29 @@ class Parser:
         self.advance()
         return NumberNode(token.value)
 
+import sys
 
-def main():
-    while True:
-        text = input("racket >> ")
-        if text == "exit":
-            break
-        lexer = Lexer(text)
-        tokens = lexer.tokenize()
-        parser = Parser(tokens)
-        ast = parser.parse()
-        if ast:
-            python_code = ast.generate_python_code()
-            print(python_code)
+def main(filename=None):
+    if filename:
+        with open(filename, 'r') as file:
+            text = file.read()
+    else:
+        while True:
+            text = input("racket >> ")
+            if text == "exit":
+                break
+    lexer = Lexer(text)
+    tokens = lexer.tokenize()
+    parser = Parser(tokens)
+    ast = parser.parse()
+    if ast:
+        python_code = ast.generate_python_code()
+        print(python_code)
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main(sys.argv[1])
+    else:
+        main()
+
