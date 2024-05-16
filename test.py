@@ -26,4 +26,5 @@ all_gt((3, 4))
 all_lt((3, 4))
 all_ge((2, 2, 3))
 
-print(add_all((1, 2, mul_all((2, 5)))))
+(lambda x = 3, y = add_all((2, 1)): print(x))()
+(lambda x = 3: print(add_all((x, x))))()

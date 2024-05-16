@@ -37,7 +37,7 @@ class TokenType(Enum):
     GREATER_EQUAL = ">="
     NOT_EQUAL = "!="
     DEFINE = "DEFINE"
-    LET = "LET"
+    LET = "LET*"
     LAMBDA = "LAMBDA"
     IF = "IF"
     COND = "COND"
@@ -303,8 +303,20 @@ class DefineNode(ASTNode):
         self.identifier = identifier
         self.expr = expr
 
+
+class LetDefinitionNode(ASTNode):
+    def __init__(self, identifier, expr):
+        self.identifier = identifier
+        self.expr = expr
+
     def generate_python_code(self):
         return f"{self.identifier.generate_python_code()} = {self.expr.generate_python_code()}"
+
+    def __str__(self):
+        return f"LetDefinitionNode({self.identifier}, {self.expr})"
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class LetNode(ASTNode):
@@ -319,7 +331,13 @@ class LetNode(ASTNode):
                 for identifier, value in self.bindings
             ]
         )
-        return f"({bindings_str}); {self.expr.generate_python_code()}"
+        "(lambda x=3, y=x+1: print(x, y)) ()"
+        return f"(lambda {bindings_str}: print({self.expr.generate_python_code()}))()"
+    def __str__(self):
+        return f"LetDefinitionNode({self.identifier}, {self.expr})"
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class LambdaNode(ASTNode):
@@ -622,15 +640,22 @@ class Parser:
         return DefineNode(identifier, value)
 
     def let_expr(self):
-        self.advance()
-        self.advance()
+        self.advance()  # Skip 'let'
+        self.advance()  # Skip '('
         bindings = []
         while self.current_tok.type != TokenType.RPAREN:
-            identifier = self.identifier_expr()
-            value = self.expr()
-            bindings.append((identifier, value))
-        self.advance()
+            if self.current_tok.type == TokenType.LBRACKET:
+                self.advance()  # Skip '['
+                identifier = self.identifier_expr()
+                value = self.expr()
+                bindings.append((identifier, value))
+                if self.current_tok.type == TokenType.RBRACKET:
+                    self.advance()  # Skip ']'
+            else:
+                self.error("Expected '['")
+        self.advance()  # Skip ')'
         expr = self.expr()
+        # print(f"bindings: {bindings}")
         return LetNode(bindings, expr)
 
     def lambda_expr(self):
