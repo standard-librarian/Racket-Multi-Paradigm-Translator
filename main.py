@@ -15,17 +15,6 @@ def main(filename=None):
                 if ast:
                     python_code = ast.generate_python_code()
                     print(python_code)
-    else:
-        while True:
-            text = input("racket >> ")
-            if text == "exit":
-                break
-            tokens = lexer.tokenize_line(text)
-            parser = Parser(tokens)
-            ast = parser.parse()
-            if ast:
-                python_code = ast.generate_python_code()
-                print(python_code)
 
 
 if __name__ == "__main__":
