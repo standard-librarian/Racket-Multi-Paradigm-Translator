@@ -166,7 +166,9 @@ class Parser:
         self.advance()  # Consume 'if'
         condition = self.expr()
         if not isinstance(condition, ASTNode):
-            condition = NumberNode(condition)  # Create a NumberNode for simple conditions
+            condition = NumberNode(
+                condition
+            )  # Create a NumberNode for simple conditions
 
         true_branch = self.expr()
         if self.current_tok.type != TokenType.RPAREN:  # Check if there's a false branch
