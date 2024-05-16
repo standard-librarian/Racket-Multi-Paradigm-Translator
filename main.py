@@ -2,6 +2,13 @@ from enum import Enum
 
 digits = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 
+user_defined_identifiers = {}
+
+
+class IdentifierType(Enum):
+    FUNCTION = "FUNCTION"
+    VARIABLE = "VARIABLE"
+
 
 class TokenType(Enum):
     LPAREN = "("
@@ -263,6 +270,26 @@ class IdentifierNode(ASTNode):
         return self.__str__()
 
 
+class FunctionCallNodeWithOperands(ASTNode):
+    def __init__(self, token, operands):
+        self.token = token
+        self.operands = operands
+
+    def generate_python_code(self):
+        output = f"{self.token.value}("
+        for operand in self.operands:
+            output += f"{operand.generate_python_code()}, "
+        output = output[:-2]
+        output += ")"
+        return output
+
+    def __str__(self):
+        return self.token.value
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class NumberNode(ASTNode):
     def __init__(self, value):
         self.value = value
@@ -421,6 +448,9 @@ class Parser:
             self.current_tok = self.tokens[self.tok_idx]
         return self.current_tok
 
+    def peek(self):
+        return self.tokens[self.tok_idx + 1]
+
     def parse(self):
         return self.expr()
 
@@ -471,6 +501,13 @@ class Parser:
     def identifier_expr(self):
         token = self.current_tok
         self.advance()
+        if token.value in user_defined_identifiers:
+            identifier_type, value = user_defined_identifiers[token.value]
+            if identifier_type == IdentifierType.FUNCTION:
+                operands = []
+                while self.current_tok.type != TokenType.RPAREN:
+                    operands.append(self.expr())
+                return FunctionCallNodeWithOperands(token, operands)
         return IdentifierNode(token)
 
     def group_expr(self):
@@ -482,7 +519,14 @@ class Parser:
     def define_expr(self):
         self.advance()
         identifier = self.identifier_expr()
+
         value = self.expr()  # Parse the expression
+        if isinstance(value, LambdaNode):
+            user_defined_identifiers[identifier.token.value] = (
+                IdentifierType.FUNCTION,
+                value,
+            )
+
         return DefineNode(identifier, value)
 
     def let_expr(self):
@@ -527,6 +571,7 @@ def main():
         if ast:
             python_code = ast.generate_python_code()
             print(python_code)
+            print(user_defined_identifiers)
 
 
 if __name__ == "__main__":
