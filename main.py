@@ -21,6 +21,7 @@ def main(filename=None):
             if text == "exit":
                 break
             tokens = lexer.tokenize_line(text)
+            # print ("tokens = " , tokens)
             parser = Parser(tokens)
             ast = parser.parse()
             if ast:
