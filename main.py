@@ -738,6 +738,10 @@ class Parser:
 
 import sys
 
+from lexar import Lexer
+from parser import Parser
+
+
 def main(filename=None):
     lexer = Lexer()
     if filename:
@@ -768,4 +772,3 @@ if __name__ == "__main__":
         main(sys.argv[1])
     else:
         main()
-
