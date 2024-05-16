@@ -45,6 +45,7 @@ class TokenType(Enum):
     WRITELN = "WRITELN"
 
 
+
 class IdentifierType(Enum):
     FUNCTION = "FUNCTION"
     VARIABLE = "VARIABLE"

@@ -6,9 +6,13 @@ from ast_nodes.display_node import DisplayNode
 from ast_nodes.div_node import DivNode
 from ast_nodes.equal_node import EqualNode
 from ast_nodes.function_call_with_operands_node import FunctionCallNodeWithOperands
+from ast_nodes.greater_equal_node import GreaterEqualNode
+from ast_nodes.greater_node import GreaterNode
 from ast_nodes.identifier_node import IdentifierNode
 from ast_nodes.if_node import IfNode
 from ast_nodes.lambda_node import LambdaNode
+from ast_nodes.less_equal_node import LessEqualNode
+from ast_nodes.less_node import LessNode
 from ast_nodes.let_node import LetNode
 from ast_nodes.mul_node import MULTNode
 from ast_nodes.number_node import NumberNode
@@ -62,6 +66,47 @@ class Parser:
                 expr = self.expr()
                 operands.append(expr)
             return AddNode(operands)
+
+        elif tok_type == TokenType.LESS:
+            self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                expr = self.expr()
+                operands.append(expr)
+            return LessNode(operands)
+
+        elif tok_type == TokenType.GREATER:
+            self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                expr = self.expr()
+                operands.append(expr)
+            return GreaterNode(operands)
+
+        elif tok_type == TokenType.LESS_EQUAL:
+            self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                expr = self.expr()
+                operands.append(expr)
+            return LessEqualNode(operands)
+
+        elif tok_type == TokenType.GREATER_EQUAL:
+            self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                expr = self.expr()
+                operands.append(expr)
+            return GreaterEqualNode(operands)
+
+        elif tok_type == TokenType.EQUAL:
+            self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                expr = self.expr()
+                operands.append(expr)
+            return EqualNode(operands)
+
         elif tok_type == TokenType.IF:
             return self.if_expr()
         elif tok_type == TokenType.COND:
@@ -84,11 +129,6 @@ class Parser:
             while self.current_tok.type != TokenType.RPAREN:
                 operands.append(self.expr())
             return DivNode(operands)
-        elif tok_type == TokenType.EQUAL:
-            self.advance()
-            left = self.expr()
-            right = self.expr()
-            return EqualNode(left, right)
         elif tok_type == TokenType.NUMBER:
             return self.number_expr()
         else:
