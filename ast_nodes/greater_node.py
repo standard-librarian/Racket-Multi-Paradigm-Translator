@@ -2,12 +2,12 @@ from ast_nodes.ast_node import ASTNode
 from ast_nodes.number_node import NumberNode
 
 
-class EqualNode(ASTNode):
+class GreaterNode(ASTNode):
     def __init__(self, operands):
         self.operands = operands
 
     def generate_python_code(self):
-        output = "all_eq(("
+        output = "all_gt(("
         for operand in self.operands:
             if isinstance(operand, NumberNode):
                 output += f"{operand.value}, "
@@ -18,7 +18,7 @@ class EqualNode(ASTNode):
         return output
 
     def __str__(self):
-        return f"EqualNode({self.operands})"
+        return f"GreateNode({self.operands})"
 
     def __repr__(self):
         return self.__str__()
