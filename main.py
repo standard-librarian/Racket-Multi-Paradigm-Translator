@@ -303,6 +303,10 @@ class DefineNode(ASTNode):
         self.identifier = identifier
         self.expr = expr
 
+    def generate_python_code(self):
+        return f"{self.identifier.generate_python_code()} = {self.expr.generate_python_code()}"
+
+
 
 class LetDefinitionNode(ASTNode):
     def __init__(self, identifier, expr):
@@ -382,8 +386,6 @@ class MULTNode(ASTNode):
 class AddNode(ASTNode):
     def __init__(self, operands):
         self.operands = operands
-        # print(self.operands)
-
     def generate_python_code(self):
         # add_all((2, 5, 7))
         output = "add_all(("
