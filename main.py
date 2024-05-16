@@ -322,6 +322,36 @@ class MULTNode(ASTNode):
         )
 
 
+class IfNode(ASTNode):
+    def __init__(self, condition, true_branch, false_branch=None):
+        self.condition = condition
+        self.true_branch = true_branch
+        self.false_branch = false_branch
+
+    def generate_python_code(self):
+        if self.false_branch:
+            return f"({self.true_branch.generate_python_code()} if {self.condition.generate_python_code()} else {self.false_branch.generate_python_code()})"
+        else:
+            return f"({self.true_branch.generate_python_code()} if {self.condition.generate_python_code()} else None)"
+
+
+class CondNode(ASTNode):
+    def __init__(self, cases):
+        self.cases = cases
+
+    def generate_python_code(self):
+        return f"({next((expr.generate_python_code() for cond, expr in self.cases if cond), None)})"
+
+class EqualNode(ASTNode):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def generate_python_code(self):
+        return f"({self.left.generate_python_code()} == {self.right.generate_python_code()})"
+
+
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -337,9 +367,9 @@ class Parser:
     def parse(self):
         return self.expr()
 
+
     def expr(self):
         tok_type = self.current_tok.type
-        print(tok_type)
         if tok_type == TokenType.IDENTIFIER:
             return self.identifier_expr()
         elif tok_type == TokenType.LPAREN:
@@ -356,25 +386,37 @@ class Parser:
             self.advance()
             left = self.expr()
             right = self.expr()
-            return f"{left} + {right}"
+            return MULTNode(left, right)
+        elif tok_type == TokenType.IF:
+            return self.if_expr()
+        elif tok_type == TokenType.COND:
+            return self.cond_expr()
         elif tok_type == TokenType.MINUS:
             self.advance()
             left = self.expr()
             right = self.expr()
-            return f"{left} - {right}"
+            return MULTNode(left, right)
         elif tok_type == TokenType.MULTIPLY:
             self.advance()
             left = self.expr()
             right = self.expr()
-            return f"{left} * {right}"
+            return MULTNode(left, right)
         elif tok_type == TokenType.DIVIDE:
             self.advance()
             left = self.expr()
             right = self.expr()
-            return f"{left} / {right}"
+            return MULTNode(left, right)
+        elif tok_type == TokenType.EQUAL:
+            self.advance()
+            left = self.expr()
+            right = self.expr()
+            return EqualNode(left, right)
+        elif tok_type == TokenType.NUMBER:
+            return self.number_expr()
         else:
             # Handle syntax errors or unsupported expressions
             pass
+
 
     def identifier_expr(self):
         token = self.current_tok
@@ -387,6 +429,30 @@ class Parser:
         self.advance()  # Consume ')'
         return expr
 
+    def if_expr(self):
+        self.advance()  # Consume 'if'
+        condition = self.expr()
+        if not isinstance(condition, ASTNode):
+            condition = NumberNode(condition)  # Create a NumberNode for simple conditions
+        
+        true_branch = self.expr()
+        if self.current_tok.type != TokenType.RPAREN:  # Check if there's a false branch
+            false_branch = self.expr()
+        else:
+            false_branch = None  # No false branch provided
+        
+        return IfNode(condition, true_branch, false_branch)
+
+    def cond_expr(self):
+        self.advance()  # Consume 'cond'
+        cases = []
+        while self.current_tok.type != TokenType.RPAREN:
+            condition = self.expr()
+            expression = self.expr()
+            cases.append((condition, expression))
+        return CondNode(cases)
+
+    
     def define_expr(self):
         self.advance()
         identifier = self.identifier_expr()
@@ -430,7 +496,6 @@ def main():
             break
         lexer = Lexer(text)
         tokens = lexer.tokenize()
-        print(tokens)
         parser = Parser(tokens)
         ast = parser.parse()
         if ast:
