@@ -60,10 +60,8 @@ class Token:
 
 
 class Lexer:
-    def __init__(self, code):
-        self.code = code
+    def __init__(self):
         self.tokens = []
-        self.position = 0
 
     def advance(self):
         self.position += 1
@@ -105,8 +103,10 @@ class Lexer:
     def is_alphanumeric(self, char):
         return char.isalnum()
 
-    def tokenize(self):
-        code = self.code
+    def tokenize_line(self, line):
+        self.code = line
+        self.position = 0
+        self.tokens = []
         while not self.is_eof():
             char = self.peek()
             if self.is_whitespace(char):
@@ -312,14 +312,157 @@ class LambdaNode(ASTNode):
 
 
 class MULTNode(ASTNode):
+    def __init__(self, operands):
+        self.operands = operands
+
+    def generate_python_code(self):
+        # mul_all((2, 5, 7))
+        output = "mul_all(("
+        for operand in self.operands:
+            if isinstance(operand, NumberNode):
+                output += f"{operand.value}, "
+            else:
+                output += operand.generate_python_code() + ", "
+        output = output[:-2]
+        output += "))"
+        return output
+
+    def __str__(self):
+        return f"MULTNode({self.operands})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class AddNode(ASTNode):
+    def __init__(self, operands):
+        self.operands = operands
+
+    def generate_python_code(self):
+        # add_all((2, 5, 7))
+        output = "add_all(("
+        for operand in self.operands:
+            if isinstance(operand, NumberNode):
+                output += f"{operand.value}, "
+            else:
+                output += operand.generate_python_code() + ", "
+
+        output = output[:-2]
+        output += "))"
+        return output
+
+    def __str__(self):
+        return f"AddNode({self.operands})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class SubNode(ASTNode):
+    def __init__(self, operands):
+        self.operands = operands
+
+    def generate_python_code(self):
+        # sub_all((2, 5, 7))
+        output = "sub_all(("
+        for operand in self.operands:
+            if isinstance(operand, NumberNode):
+                output += f"{operand.value}, "
+            else:
+                output += operand.generate_python_code() + ", "
+
+        output = output[:-2]
+        output += "))"
+        return output
+
+    def __str__(self):
+        return f"SubNode({self.operands})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class DivNode(ASTNode):
+    def __init__(self, operands):
+        self.operands = operands
+
+    def generate_python_code(self):
+        # div_all((2, 5, 7))
+        output = "div_all(("
+        for operand in self.operands:
+            if isinstance(operand, NumberNode):
+                output += f"{operand.value}, "
+            else:
+                output += operand.generate_python_code() + ", "
+        output = output[:-2]
+        output += "))"
+        return output
+
+    def __str__(self):
+        return f"DivNode({self.operands})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class IfNode(ASTNode):
+    def __init__(self, condition, true_branch, false_branch=None):
+        self.condition = condition
+        self.true_branch = true_branch
+        self.false_branch = false_branch
+
+    def generate_python_code(self):
+        if self.false_branch:
+            return f"({self.true_branch.generate_python_code()} if {self.condition.generate_python_code()} else {self.false_branch.generate_python_code()})"
+        else:
+            return f"({self.true_branch.generate_python_code()} if {self.condition.generate_python_code()} else None)"
+
+
+class CondNode(ASTNode):
+    def __init__(self, cases):
+        self.cases = cases
+
+    def generate_python_code(self):
+        return f"({next((expr.generate_python_code() for cond, expr in self.cases if cond), None)})"
+
+class EqualNode(ASTNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right
 
     def generate_python_code(self):
-        return (
-            f"{self.left.generate_python_code()} * {self.right.generate_python_code()}"
-        )
+        return f"({self.left.generate_python_code()} == {self.right.generate_python_code()})"
+
+
+
+class IfNode(ASTNode):
+    def __init__(self, condition, true_branch, false_branch=None):
+        self.condition = condition
+        self.true_branch = true_branch
+        self.false_branch = false_branch
+
+    def generate_python_code(self):
+        if self.false_branch:
+            return f"({self.true_branch.generate_python_code()} if {self.condition.generate_python_code()} else {self.false_branch.generate_python_code()})"
+        else:
+            return f"({self.true_branch.generate_python_code()} if {self.condition.generate_python_code()} else None)"
+
+
+class CondNode(ASTNode):
+    def __init__(self, cases):
+        self.cases = cases
+
+    def generate_python_code(self):
+        return f"({next((expr.generate_python_code() for cond, expr in self.cases if cond), None)})"
+
+class EqualNode(ASTNode):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def generate_python_code(self):
+        return f"({self.left.generate_python_code()} == {self.right.generate_python_code()})"
+
 
 
 class Parser:
@@ -337,9 +480,9 @@ class Parser:
     def parse(self):
         return self.expr()
 
+
     def expr(self):
         tok_type = self.current_tok.type
-        print(tok_type)
         if tok_type == TokenType.IDENTIFIER:
             return self.identifier_expr()
         elif tok_type == TokenType.LPAREN:
@@ -354,27 +497,44 @@ class Parser:
             return self.lambda_expr()
         elif tok_type == TokenType.PLUS:
             self.advance()
-            left = self.expr()
-            right = self.expr()
-            return f"{left} + {right}"
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                expr = self.expr()
+                operands.append(expr)
+            return AddNode(operands)
+        elif tok_type == TokenType.IF:
+            return self.if_expr()
+        elif tok_type == TokenType.COND:
+            return self.cond_expr()
         elif tok_type == TokenType.MINUS:
             self.advance()
-            left = self.expr()
-            right = self.expr()
-            return f"{left} - {right}"
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                operands.append(self.expr())
+            return SubNode(operands)
         elif tok_type == TokenType.MULTIPLY:
             self.advance()
-            left = self.expr()
-            right = self.expr()
-            return f"{left} * {right}"
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                operands.append(self.expr())
+            return MULTNode(operands)
         elif tok_type == TokenType.DIVIDE:
+            self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                operands.append(self.expr())
+            return DivNode(operands)
+        elif tok_type == TokenType.EQUAL:
             self.advance()
             left = self.expr()
             right = self.expr()
-            return f"{left} / {right}"
+            return EqualNode(left, right)
+        elif tok_type == TokenType.NUMBER:
+            return self.number_expr()
         else:
             # Handle syntax errors or unsupported expressions
             pass
+
 
     def identifier_expr(self):
         token = self.current_tok
@@ -387,6 +547,30 @@ class Parser:
         self.advance()  # Consume ')'
         return expr
 
+    def if_expr(self):
+        self.advance()  # Consume 'if'
+        condition = self.expr()
+        if not isinstance(condition, ASTNode):
+            condition = NumberNode(condition)  # Create a NumberNode for simple conditions
+        
+        true_branch = self.expr()
+        if self.current_tok.type != TokenType.RPAREN:  # Check if there's a false branch
+            false_branch = self.expr()
+        else:
+            false_branch = None  # No false branch provided
+        
+        return IfNode(condition, true_branch, false_branch)
+
+    def cond_expr(self):
+        self.advance()  # Consume 'cond'
+        cases = []
+        while self.current_tok.type != TokenType.RPAREN:
+            condition = self.expr()
+            expression = self.expr()
+            cases.append((condition, expression))
+        return CondNode(cases)
+
+    
     def define_expr(self):
         self.advance()
         identifier = self.identifier_expr()
@@ -408,7 +592,6 @@ class Parser:
     def lambda_expr(self):
         self.advance()
         self.advance()
-        print(str(self.current_tok))
         params = []
         while self.current_tok.type != TokenType.RPAREN:
             identifier = self.identifier_expr()
@@ -422,21 +605,35 @@ class Parser:
         self.advance()
         return NumberNode(token.value)
 
+import sys
 
-def main():
-    while True:
-        text = input("racket >> ")
-        if text == "exit":
-            break
-        lexer = Lexer(text)
-        tokens = lexer.tokenize()
-        print(tokens)
-        parser = Parser(tokens)
-        ast = parser.parse()
-        if ast:
-            python_code = ast.generate_python_code()
-            print(python_code)
+def main(filename=None):
+    lexer = Lexer()
+    if filename:
+        with open(filename, 'r') as file:
+            for line in file:
+                tokens = lexer.tokenize_line(line)
+                parser = Parser(tokens)
+                ast = parser.parse()
+                if ast:
+                    python_code = ast.generate_python_code()
+                    print(python_code)
+    else:
+        while True:
+            text = input("racket >> ")
+            if text == "exit":
+                break
+            tokens = lexer.tokenize_line(text)
+            parser = Parser(tokens)
+            ast = parser.parse()
+            if ast:
+                python_code = ast.generate_python_code()
+                print(python_code)
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main(sys.argv[1])
+    else:
+        main()
+
