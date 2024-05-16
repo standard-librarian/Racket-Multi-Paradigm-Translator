@@ -7,7 +7,7 @@ from parser import Parser
 def main(filename=None):
     lexer = Lexer()
     if filename:
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             for line in file:
                 tokens = lexer.tokenize_line(line)
                 parser = Parser(tokens)
