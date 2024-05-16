@@ -46,6 +46,7 @@ class TokenType(Enum):
     LIST = "LIST"
 
 
+
 class IdentifierType(Enum):
     FUNCTION = "FUNCTION"
     VARIABLE = "VARIABLE"
