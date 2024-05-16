@@ -310,8 +310,20 @@ class DefineNode(ASTNode):
         self.identifier = identifier
         self.expr = expr
 
+
+class LetDefinitionNode(ASTNode):
+    def __init__(self, identifier, expr):
+        self.identifier = identifier
+        self.expr = expr
+
     def generate_python_code(self):
         return f"{self.identifier.generate_python_code()} = {self.expr.generate_python_code()}"
+
+    def __str__(self):
+        return f"LetDefinitionNode({self.identifier}, {self.expr})"
+
+    def __repr__(self):
+        return self.__str__()
 
 
 
@@ -343,6 +355,7 @@ class LetNode(ASTNode):
             ]
         )
         "(lambda x=3, y=x+1: print(x, y)) ()"
+
         return f"(lambda {bindings_str}: {self.expr.generate_python_code()})()"
     def __str__(self):
         return f"LetDefinitionNode({self.identifier}, {self.expr})"
@@ -607,6 +620,7 @@ class Parser:
     def identifier_expr(self):
         token = self.current_tok
         self.advance()
+
         if token.value == "display":
             self.advance()
             expr = self.expr()
