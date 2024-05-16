@@ -256,6 +256,13 @@ class ASTNode:
         pass
 
 
+class DisplayNode(ASTNode):
+    def __init__(self, expr):
+        self.expr = expr
+
+    def generate_python_code(self):
+        return f"print({self.expr.generate_python_code()})"
+
 class IdentifierNode(ASTNode):
     def __init__(self, token):
         self.token = token
@@ -319,6 +326,22 @@ class LetDefinitionNode(ASTNode):
         return self.__str__()
 
 
+
+class LetDefinitionNode(ASTNode):
+    def __init__(self, identifier, expr):
+        self.identifier = identifier
+        self.expr = expr
+
+    def generate_python_code(self):
+        return f"{self.identifier.generate_python_code()} = {self.expr.generate_python_code()}"
+
+    def __str__(self):
+        return f"LetDefinitionNode({self.identifier}, {self.expr})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class LetNode(ASTNode):
     def __init__(self, bindings, expr):
         self.bindings = bindings
@@ -332,7 +355,8 @@ class LetNode(ASTNode):
             ]
         )
         "(lambda x=3, y=x+1: print(x, y)) ()"
-        return f"(lambda {bindings_str}: print({self.expr.generate_python_code()}))()"
+
+        return f"(lambda {bindings_str}: {self.expr.generate_python_code()})()"
     def __str__(self):
         return f"LetDefinitionNode({self.identifier}, {self.expr})"
 
@@ -382,7 +406,6 @@ class MULTNode(ASTNode):
 class AddNode(ASTNode):
     def __init__(self, operands):
         self.operands = operands
-
     def generate_python_code(self):
         # add_all((2, 5, 7))
         output = "add_all(("
@@ -478,6 +501,12 @@ class EqualNode(ASTNode):
     def generate_python_code(self):
         return f"({self.left.generate_python_code()} == {self.right.generate_python_code()})"
 
+class StringNode(ASTNode):
+    def __init__(self, token):
+        self.token = token
+
+    def generate_python_code(self):
+        return repr(self.token.value)
 
 
 class IfNode(ASTNode):
@@ -533,6 +562,10 @@ class Parser:
         tok_type = self.current_tok.type
         if tok_type == TokenType.IDENTIFIER:
             return self.identifier_expr()
+        elif self.current_tok.type == TokenType.STRING:
+            token = self.current_tok
+            self.advance()
+            return StringNode(token)
         elif tok_type == TokenType.LPAREN:
             return self.group_expr()
         elif tok_type == TokenType.NUMBER:
@@ -587,6 +620,11 @@ class Parser:
     def identifier_expr(self):
         token = self.current_tok
         self.advance()
+
+        if token.value == "display":
+            self.advance()
+            expr = self.expr()
+            return DisplayNode(expr)
         if token.value in user_defined_identifiers:
             identifier_type, value = user_defined_identifiers[token.value]
             if identifier_type == IdentifierType.FUNCTION:
