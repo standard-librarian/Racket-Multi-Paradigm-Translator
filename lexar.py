@@ -173,6 +173,9 @@ class Lexer:
                     self.tokens.append(Token(TokenType.FOLDL, identifier.upper()))
                 elif identifier.upper() == "WRITELN":
                     self.tokens.append(Token(TokenType.WRITELN, identifier.upper()))
+                elif identifier.upper() == "LIST":
+                    self.tokens.append(Token(TokenType.LIST, identifier.upper()))
+
                 else:
                     self.tokens.append(Token(TokenType.IDENTIFIER, identifier))
                 identifier = ""
