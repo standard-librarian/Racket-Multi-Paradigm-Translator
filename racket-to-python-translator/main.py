@@ -1,10 +1,6 @@
 import sys
 import os
 
-# SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-# sys.path.append(os.path.join(SCRIPT_DIR, "src"))
-
-
 from .lexer import Lexer
 from .parser import Parser
 
@@ -37,7 +33,7 @@ def main(filename=None):
             if text == "exit":
                 break
             tokens = lexer.tokenize_line(text)
-            # print ("tokens = " , tokens)
+            # print("tokens = ", tokens)
             parser = Parser(tokens)
             ast = parser.parse()
             if ast:
