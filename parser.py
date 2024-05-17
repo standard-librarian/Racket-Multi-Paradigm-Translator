@@ -18,6 +18,7 @@ from ast_nodes.mul_node import MULTNode
 from ast_nodes.number_node import NumberNode
 from ast_nodes.string_node import StringNode
 from ast_nodes.sub_node import SubNode
+from ast_nodes.list_node import ListNodes
 from token_types import TokenType, IdentifierType
 
 user_defined_identifiers = {}
@@ -131,6 +132,9 @@ class Parser:
             return DivNode(operands)
         elif tok_type == TokenType.NUMBER:
             return self.number_expr()
+        elif tok_type == TokenType.LIST:
+            return self.list_expr()
+
         else:
             # Handle syntax errors or unsupported expressions
             pass

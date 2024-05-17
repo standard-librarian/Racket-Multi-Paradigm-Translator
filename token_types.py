@@ -43,6 +43,7 @@ class TokenType(Enum):
     MAP = "MAP"
     FOLDL = "FOLDL"
     WRITELN = "WRITELN"
+    LIST = "LIST"
 
 
 
