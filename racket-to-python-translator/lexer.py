@@ -173,8 +173,17 @@ class Lexer:
                     self.tokens.append(Token(TokenType.FOLDL, identifier.upper()))
                 elif identifier.upper() == "WRITELN":
                     self.tokens.append(Token(TokenType.WRITELN, identifier.upper()))
+                elif identifier.upper() == "BUILD-LIST":
+                    self.tokens.append(Token(TokenType.BUILD_LIST, identifier.upper()))
+                elif identifier.upper() == "MAKE-LIST":
+                    self.tokens.append(Token(TokenType.MAKE_LIST, identifier.upper()))
                 elif identifier.upper() == "LIST":
                     self.tokens.append(Token(TokenType.LIST, identifier.upper()))
+                elif identifier.upper() == "VALUES":
+                    self.tokens.append(Token(TokenType.VALUES, identifier.upper()))
+                elif identifier.upper() == "RANGE":
+                    self.tokens.append(Token(TokenType.RANGE, identifier.upper()))
+
 
                 else:
                     self.tokens.append(Token(TokenType.IDENTIFIER, identifier))

@@ -19,6 +19,10 @@ from .ast_nodes.number_node import NumberNode
 from .ast_nodes.string_node import StringNode
 from .ast_nodes.sub_node import SubNode
 from .ast_nodes.list_node import ListNodes
+from .ast_nodes.build_list_node import BuildListNode
+from .ast_nodes.make_list_node import MakeListNode
+from .ast_nodes.values_node import ValuesNode
+from .ast_nodes.range_node import RangeNode
 from .token_types import TokenType, IdentifierType
 
 user_defined_identifiers = {}
@@ -134,7 +138,14 @@ class Parser:
             return self.number_expr()
         elif tok_type == TokenType.LIST:
             return self.list_expr()
-
+        elif tok_type == TokenType.BUILD_LIST:
+            return self.build_list_expr()
+        elif tok_type == TokenType.MAKE_LIST:
+            return self.make_list_expr()
+        elif tok_type == TokenType.VALUES:
+            return self.values_expr()
+        elif tok_type == TokenType.RANGE:
+            return self.range_expr()
         else:
             # Handle syntax errors or unsupported expressions
             pass
@@ -227,6 +238,36 @@ class Parser:
         self.advance()  # Skip ')'
         return ListNodes(elements)
 
+    def build_list_expr(self):
+        self.advance()  # Skip 'build-list'
+        size = self.expr()  # Parse the size argument
+        generator = self.expr()  # Parse the value generator
+        self.advance()
+        return BuildListNode(size, generator)
+
+    def make_list_expr(self):
+        self.advance()  # Skip 'make-list'
+        element = self.expr()  # Parse the size argument
+        size = self.expr()  # Parse the value generator
+        self.advance()
+        return MakeListNode(element, size)
+
+    def values_expr(self):
+        return ValuesNode()
+
+    def range_expr(self):
+        self.advance()  # Skip 'range'
+        start = self.expr()  # Parse the start value
+        if self.current_tok and self.current_tok.type == TokenType.NUMBER:
+            end = self.expr()  # Parse the end value
+        else:
+            end = None
+        if self.current_tok and self.current_tok.type == TokenType.NUMBER:
+            step = self.expr()  # Parse the step value
+        else:
+            step = None
+        self.advance()  # Skip ')'
+        return RangeNode(start, end, step)
     def lambda_expr(self):
         self.advance()
         self.advance()
