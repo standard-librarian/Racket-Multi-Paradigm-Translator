@@ -1,6 +1,3 @@
-# test objectives
-# test the basic operators for racket and that they are converted to python
-
 import unittest
 from ..main import test_line
 
