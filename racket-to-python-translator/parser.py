@@ -31,6 +31,7 @@ from .ast_nodes.tan_node import TanNode
 from .ast_nodes.round_node import RoundNode
 from .ast_nodes.ceil_node import CeilNode
 from .ast_nodes.floor_node import FloorNode
+from .ast_nodes.comment_node import CommentNode
 from .token_types import TokenType, IdentifierType
 
 user_defined_identifiers = {}
@@ -170,6 +171,10 @@ class Parser:
             return self.ceil_expr()
         elif tok_type == TokenType.FLOOR:
             return self.floor_expr()
+        elif tok_type == TokenType.COMMENT:
+            token = self.current_tok
+            self.advance()
+            return CommentNode(token.value)
         else:
             # Handle syntax errors or unsupported expressions
             pass
@@ -291,6 +296,7 @@ class Parser:
             step = None
         self.advance()  # Skip ')'
         return RangeNode(start, end, step)
+
     def lambda_expr(self):
         self.advance()
         self.advance()
@@ -304,40 +310,40 @@ class Parser:
 
     def sqrt_expr(self):
         # ( sqrt expr )
-        self.advance() # Skip 'sqrt'
-        elements = []  # expr 
+        self.advance()  # Skip 'sqrt'
+        elements = []  # expr
         while self.current_tok.type != TokenType.RPAREN:
             elements.append(self.expr())
         self.advance()
         return SqrtNode(elements)
-    
+
     def abs_expr(self):
         # ( abs number )
-        self.advance() # Skip 'abs'
-        elements = []  # expr 
+        self.advance()  # Skip 'abs'
+        elements = []  # expr
         while self.current_tok.type != TokenType.RPAREN:
             elements.append(self.expr())
         return AbsNode(elements)
-    
+
     def sin_expr(self):
         # ( sin number )
-        self.advance() # Skip 'sin'
+        self.advance()  # Skip 'sin'
         elements = []
         while self.current_tok.type != TokenType.RPAREN:
             elements.append(self.expr())
         return SinNode(elements)
-    
+
     def cos_expr(self):
         # ( cos number )
-        self.advance() # Skip 'cos'
+        self.advance()  # Skip 'cos'
         elements = []
         while self.current_tok.type != TokenType.RPAREN:
             elements.append(self.expr())
         return CosNode(elements)
-   
+
     def tan_expr(self):
         # ( tan number )
-        self.advance() # Skip 'tan'
+        self.advance()  # Skip 'tan'
         elements = []
         while self.current_tok.type != TokenType.RPAREN:
             elements.append(self.expr())
@@ -345,7 +351,7 @@ class Parser:
 
     def round_expr(self):
         # ( round number )
-        self.advance() # Skip 'round'
+        self.advance()  # Skip 'round'
         elements = []
         while self.current_tok.type != TokenType.RPAREN:
             elements.append(self.expr())
@@ -353,20 +359,19 @@ class Parser:
 
     def ceil_expr(self):
         # ( ceil number )
-        self.advance() # Skip 'ceil'
+        self.advance()  # Skip 'ceil'
         elements = []
         while self.current_tok.type != TokenType.RPAREN:
             elements.append(self.expr())
         return CeilNode(elements)
-    
+
     def floor_expr(self):
         # ( floor number )
-        self.advance() # Skip 'floor'
+        self.advance()  # Skip 'floor'
         elements = []
         while self.current_tok.type != TokenType.RPAREN:
             elements.append(self.expr())
         return FloorNode(elements)
-
 
     def number_expr(self):
         token = self.current_tok
