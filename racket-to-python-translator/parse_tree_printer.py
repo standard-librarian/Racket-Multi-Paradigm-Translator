@@ -16,7 +16,7 @@ from .ast_nodes.let_node import LetNode
 from .ast_nodes.mul_node import MULTNode
 from .ast_nodes.number_node import NumberNode
 from .ast_nodes.string_node import StringNode
-from .ast_nodes.sub_node import SubNode
+from .ast_nodes.list_node import ListNodes
 from .ast_nodes.comment_node import CommentNode
 from .ast_nodes.ast_node import ASTNode
 
@@ -59,6 +59,13 @@ def print_parse_tree(node, indent="", last_child=True, label=None):
         child_nodes = [node.value]
     elif isinstance(node, IdentifierNode):
         child_nodes = [node.token.value]
+    elif isinstance(node, ListNodes):
+        child_nodes = node.elements  # Special case for ListNodes
+    elif isinstance(node, LambdaNode):
+        child_nodes = [
+            ("EXPRESSION", node.expr),
+            ("PARAMS", node.params),
+        ]
     elif isinstance(node, StringNode):
         child_nodes = [f"'{node.token.value}'"]
     else:
@@ -71,9 +78,15 @@ def print_parse_tree(node, indent="", last_child=True, label=None):
     for i, child in enumerate(child_nodes):
         if isinstance(child, tuple):
             label, child_node = child
-            tree_representation += print_parse_tree(
-                child_node, child_indent, i == len(child_nodes) - 1, label=label
-            )
+            if isinstance(child_node, list) and all(isinstance(elem, ASTNode) for elem in child_node):
+                for j, sub_child in enumerate(child_node):
+                    tree_representation += print_parse_tree(
+                        sub_child, child_indent, j == len(child_node) - 1, label=label if j == 0 else None
+                    )
+            else:
+                tree_representation += print_parse_tree(
+                    child_node, child_indent, i == len(child_nodes) - 1, label=label
+                )
         else:
             tree_representation += print_parse_tree(
                 child, child_indent, i == len(child_nodes) - 1

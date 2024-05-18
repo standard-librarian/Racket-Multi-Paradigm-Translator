@@ -1,0 +1,112 @@
+
+(define sum_ (lambda (x y) (+ x y)))
+
+DefineNode
+    ├── IdentifierNode
+    │   └── sum_
+    └── LambdaNode
+        ├── PARAMS
+        │   ├── IdentifierNode
+        │   │   └── x
+        └── IdentifierNode
+            └── y
+        └── EXPRESSION
+            └── AddNode
+                ├── IdentifierNode
+                │   └── y
+                └── IdentifierNode
+                    └── x
+*******************************************************
+(define x (sum_ 1 2))
+
+DefineNode
+    ├── IdentifierNode
+    │   └── x
+    └── FunctionCallNodeWithOperands
+        ├── NumberNode
+        │   └── 2
+        └── NumberNode
+            └── 1
+*******************************************************
+(display (if (= x 10) "it is 10\n" "it is not 10\n"))
+
+DisplayNode
+    └── IfNode
+        ├── CONDITION
+        │   ├── EqualNode
+        │   │   ├── NumberNode
+        │   │   │   └── 10
+        │   │   └── IdentifierNode
+        │   │       └── x
+        ├── THEN
+        │   ├── StringNode
+        │   │   └── 'it is 10\n'
+        └── ELSE
+            └── StringNode
+                └── 'it is not 10\n'
+*******************************************************
+(> 1 2 (< 3 4 (= 5 (+ 4 (>= 3 4 (<= 99 -0.34)))) 6 7))
+
+GreaterNode
+    ├── LessNode
+    │   ├── NumberNode
+    │   │   └── 7
+    │   ├── NumberNode
+    │   │   └── 6
+    │   ├── EqualNode
+    │   │   ├── AddNode
+    │   │   │   ├── GreaterEqualNode
+    │   │   │   │   ├── LessEqualNode
+    │   │   │   │   │   ├── UnaryNumberNode
+    │   │   │   │   │   │   └── NumberNode
+    │   │   │   │   │   │       └── float
+    │   │   │   │   │   └── NumberNode
+    │   │   │   │   │       └── 99
+    │   │   │   │   ├── NumberNode
+    │   │   │   │   │   └── 4
+    │   │   │   │   └── NumberNode
+    │   │   │   │       └── 3
+    │   │   │   └── NumberNode
+    │   │   │       └── 4
+    │   │   └── NumberNode
+    │   │       └── 5
+    │   ├── NumberNode
+    │   │   └── 4
+    │   └── NumberNode
+    │       └── 3
+    ├── NumberNode
+    │   └── 2
+    └── NumberNode
+        └── 1
+*******************************************************
+(build-list 20 (lambda (x) (make-list x x)))
+
+BuildListNode
+    ├── NumberNode
+    │   └── 20
+    └── LambdaNode
+        └── PARAMS
+            └── IdentifierNode
+                └── x
+        └── EXPRESSION
+            └── MakeListNode
+                ├── IdentifierNode
+                │   └── x
+                └── IdentifierNode
+                    └── x
+*******************************************************
+;sum_ = lambda x, y: add_all((x, y))
+
+CommentNode
+*******************************************************
+;x = sum_(1, 2)
+
+CommentNode
+*******************************************************
+;print(('it is 10\\n' if all_eq((x, 10)) else 'it is not 10\\n'))
+
+CommentNode
+*******************************************************
+;all_gt((1, 2, all_lt((3, 4, all_eq((5, add_all((4, all_ge((3, 4, all_le((99, sub_all((0.34)))))))))), 6, 7))))
+CommentNode
+*******************************************************
