@@ -28,6 +28,7 @@ class Lexer:
     def make_number(self):
         number = ""
         num_of_dots = 0
+        fraction_flag = False
         while not self.is_eof() and self.peek().isdigit():
             number += self.peek()
             self.advance()
@@ -38,8 +39,17 @@ class Lexer:
             while not self.is_eof() and self.peek().isdigit():
                 number += self.peek()
                 self.advance()
-        if num_of_dots == 0:
+        if not self.is_eof() and self.peek() == "/": #Handeling Fractions : 9/3
+            number += "/"
+            fraction_flag = True
+            self.advance()
+            while not self.is_eof() and self.peek().isdigit():
+                number += self.peek()
+                self.advance()
+        if num_of_dots == 0 and not fraction_flag:
             return Token(TokenType.NUMBER, int(number))
+        elif fraction_flag:
+            return Token(TokenType.NUMBER, number)
         return Token(TokenType.NUMBER, float(number))
 
     def is_alpha(self, char):
