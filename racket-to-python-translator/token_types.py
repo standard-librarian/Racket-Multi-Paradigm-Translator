@@ -39,6 +39,7 @@ class TokenType(Enum):
     ELSE = "ELSE"
     COMMENT = "COMMENT"
     MAX = "MAX"
+    MIN = "MIN"
     ABS = "ABS"
     SQRT = "SQRT"
     SIN = "SIN"
@@ -55,8 +56,6 @@ class TokenType(Enum):
     MAKE_LIST = "MAKE_LIST"
     VALUES = "VALUES"
     RANGE = "RANGE"
-
-
 
 
 class IdentifierType(Enum):

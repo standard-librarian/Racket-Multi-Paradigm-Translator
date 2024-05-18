@@ -33,6 +33,8 @@ from .ast_nodes.ceil_node import CeilNode
 from .ast_nodes.floor_node import FloorNode
 from .ast_nodes.comment_node import CommentNode
 from .ast_nodes.unary_number_node import UnaryNumberNode
+from .ast_nodes.max_node import MaxNode
+from .ast_nodes.min_node import MinNode
 from .token_types import TokenType, IdentifierType
 from .token import Token
 
@@ -76,6 +78,21 @@ class Parser:
             return self.define_expr()
         elif tok_type == TokenType.LET:
             return self.let_expr()
+        elif tok_type == TokenType.MAX:
+            self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                expr = self.expr()
+                operands.append(expr)
+            return MaxNode(operands)
+
+        elif tok_type == TokenType.MIN:
+            self.advance()
+            operands = []
+            while self.current_tok.type != TokenType.RPAREN:
+                expr = self.expr()
+                operands.append(expr)
+            return MinNode(operands)
         elif tok_type == TokenType.LAMBDA:
             return self.lambda_expr()
 

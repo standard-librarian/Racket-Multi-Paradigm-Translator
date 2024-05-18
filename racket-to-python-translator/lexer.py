@@ -165,6 +165,8 @@ class Lexer:
                     self.tokens.append(Token(TokenType.ZERO_QMARK, identifier.upper()))
                 elif identifier.upper() == "MAX":
                     self.tokens.append(Token(TokenType.MAX, identifier.upper()))
+                elif identifier.upper() == "MIN":
+                    self.tokens.append(Token(TokenType.MIN, identifier.upper()))
                 elif identifier.upper() == "SQRT":
                     self.tokens.append(Token(TokenType.SQRT, identifier.upper()))
                 elif identifier.upper() == "MAP":
