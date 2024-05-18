@@ -39,11 +39,19 @@ class TokenType(Enum):
     ELSE = "ELSE"
     COMMENT = "COMMENT"
     MAX = "MAX"
+    ABS = "ABS"
     SQRT = "SQRT"
+    SIN = "SIN"
+    COS = "COS"
+    TAN = "TAN"
+    FLOOR = "FLOOR"
+    ROUND = "ROUND"
+    CEIL = "CEIL"
     MAP = "MAP"
     FOLDL = "FOLDL"
     WRITELN = "WRITELN"
     LIST = "LIST"
+
 
 
 
