@@ -1,7 +1,10 @@
+#lang racket
 (define sum_ (lambda (x y) (+ x y)))
 (define x (sum_ 1 2))
 (display (if (= x 10) "it is 10\n" "it is not 10\n"))
-(> 1 2 (< 3 4 (= 5 (+ 4 (>= 3 4 (<= 99 -0.34)))) 6 7))
+;(> 1 2 (< 3 4 (= 5 (+ 4 (>= 3 4 (<= 99 -0.34)))) 6 7))
+(build-list 20 (lambda (x) (make-list x x)))
+
 ;sum_ = lambda x, y: add_all((x, y))
 ;x = sum_(1, 2)
 ;print(('it is 10\\n' if all_eq((x, 10)) else 'it is not 10\\n'))

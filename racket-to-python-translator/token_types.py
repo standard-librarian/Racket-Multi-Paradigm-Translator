@@ -51,6 +51,10 @@ class TokenType(Enum):
     FOLDL = "FOLDL"
     WRITELN = "WRITELN"
     LIST = "LIST"
+    BUILD_LIST = "BUILD-LIST"
+    MAKE_LIST = "MAKE_LIST"
+    VALUES = "VALUES"
+    RANGE = "RANGE"
 
 
 
