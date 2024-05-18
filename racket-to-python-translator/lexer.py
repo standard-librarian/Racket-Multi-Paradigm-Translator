@@ -1,5 +1,5 @@
-from token import Token
-from token_types import TokenType
+from .token import Token
+from .token_types import TokenType
 
 digits = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 
@@ -173,6 +173,9 @@ class Lexer:
                     self.tokens.append(Token(TokenType.FOLDL, identifier.upper()))
                 elif identifier.upper() == "WRITELN":
                     self.tokens.append(Token(TokenType.WRITELN, identifier.upper()))
+                elif identifier.upper() == "LIST":
+                    self.tokens.append(Token(TokenType.LIST, identifier.upper()))
+
                 else:
                     self.tokens.append(Token(TokenType.IDENTIFIER, identifier))
                 identifier = ""

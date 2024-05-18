@@ -1,5 +1,5 @@
-from ast_nodes.ast_node import ASTNode
-from ast_nodes.number_node import NumberNode
+from .ast_node import ASTNode
+from .number_node import NumberNode
 
 
 class GreaterEqualNode(ASTNode):

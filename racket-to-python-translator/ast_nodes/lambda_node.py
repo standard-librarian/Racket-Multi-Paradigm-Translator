@@ -1,4 +1,4 @@
-from ast_nodes.ast_node import ASTNode
+from .ast_node import ASTNode
 
 
 class LambdaNode(ASTNode):
@@ -7,7 +7,9 @@ class LambdaNode(ASTNode):
         self.expr = expr
 
     def generate_python_code(self):
-        params_str = ", ".join([param.generate_python_code() for param in self.params])
+        params_str = ", ".join(
+            [str(param.generate_python_code()) for param in self.params]
+        )
         return f"lambda {params_str}: {self.expr.generate_python_code()}"
 
     def __str__(self):

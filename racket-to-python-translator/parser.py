@@ -1,24 +1,25 @@
-from ast_nodes.add_node import AddNode
-from ast_nodes.ast_node import ASTNode
-from ast_nodes.cond_node import CondNode
-from ast_nodes.define_node import DefineNode
-from ast_nodes.display_node import DisplayNode
-from ast_nodes.div_node import DivNode
-from ast_nodes.equal_node import EqualNode
-from ast_nodes.function_call_with_operands_node import FunctionCallNodeWithOperands
-from ast_nodes.greater_equal_node import GreaterEqualNode
-from ast_nodes.greater_node import GreaterNode
-from ast_nodes.identifier_node import IdentifierNode
-from ast_nodes.if_node import IfNode
-from ast_nodes.lambda_node import LambdaNode
-from ast_nodes.less_equal_node import LessEqualNode
-from ast_nodes.less_node import LessNode
-from ast_nodes.let_node import LetNode
-from ast_nodes.mul_node import MULTNode
-from ast_nodes.number_node import NumberNode
-from ast_nodes.string_node import StringNode
-from ast_nodes.sub_node import SubNode
-from token_types import TokenType, IdentifierType
+from .ast_nodes.add_node import AddNode
+from .ast_nodes.ast_node import ASTNode
+from .ast_nodes.cond_node import CondNode
+from .ast_nodes.define_node import DefineNode
+from .ast_nodes.display_node import DisplayNode
+from .ast_nodes.div_node import DivNode
+from .ast_nodes.equal_node import EqualNode
+from .ast_nodes.function_call_with_operands_node import FunctionCallNodeWithOperands
+from .ast_nodes.greater_equal_node import GreaterEqualNode
+from .ast_nodes.greater_node import GreaterNode
+from .ast_nodes.identifier_node import IdentifierNode
+from .ast_nodes.if_node import IfNode
+from .ast_nodes.lambda_node import LambdaNode
+from .ast_nodes.less_equal_node import LessEqualNode
+from .ast_nodes.less_node import LessNode
+from .ast_nodes.let_node import LetNode
+from .ast_nodes.mul_node import MULTNode
+from .ast_nodes.number_node import NumberNode
+from .ast_nodes.string_node import StringNode
+from .ast_nodes.sub_node import SubNode
+from .ast_nodes.list_node import ListNodes
+from .token_types import TokenType, IdentifierType
 
 user_defined_identifiers = {}
 
@@ -131,6 +132,9 @@ class Parser:
             return DivNode(operands)
         elif tok_type == TokenType.NUMBER:
             return self.number_expr()
+        elif tok_type == TokenType.LIST:
+            return self.list_expr()
+
         else:
             # Handle syntax errors or unsupported expressions
             pass
@@ -162,7 +166,9 @@ class Parser:
         self.advance()  # Consume 'if'
         condition = self.expr()
         if not isinstance(condition, ASTNode):
-            condition = NumberNode(condition)  # Create a NumberNode for simple conditions
+            condition = NumberNode(
+                condition
+            )  # Create a NumberNode for simple conditions
 
         true_branch = self.expr()
         if self.current_tok.type != TokenType.RPAREN:  # Check if there's a false branch
@@ -212,6 +218,14 @@ class Parser:
         expr = self.expr()
         # print(f"bindings: {bindings}")
         return LetNode(bindings, expr)
+
+    def list_expr(self):
+        self.advance()  # Skip 'list'
+        elements = []
+        while self.current_tok.type != TokenType.RPAREN:
+            elements.append(self.expr())
+        self.advance()  # Skip ')'
+        return ListNodes(elements)
 
     def lambda_expr(self):
         self.advance()
