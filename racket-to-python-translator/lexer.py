@@ -183,8 +183,20 @@ class Lexer:
                     self.tokens.append(Token(TokenType.VALUES, identifier.upper()))
                 elif identifier.upper() == "RANGE":
                     self.tokens.append(Token(TokenType.RANGE, identifier.upper()))
-
-
+                elif identifier.upper() == "ABS":
+                    self.tokens.append(Token(TokenType.ABS, identifier.upper()))
+                elif identifier.upper() == "SIN":
+                    self.tokens.append(Token(TokenType.SIN, identifier.upper()))
+                elif identifier.upper() == "COS":
+                    self.tokens.append(Token(TokenType.COS, identifier.upper()))
+                elif identifier.upper() == "TAN":
+                    self.tokens.append(Token(TokenType.TAN, identifier.upper()))
+                elif identifier.upper() == "FLOOR":
+                    self.tokens.append(Token(TokenType.FLOOR, identifier.upper()))
+                elif identifier.upper() == "ROUND":
+                    self.tokens.append(Token(TokenType.ROUND, identifier.upper()))
+                elif identifier.upper() == "CEIL":
+                    self.tokens.append(Token(TokenType.CEIL, identifier.upper()))
                 else:
                     self.tokens.append(Token(TokenType.IDENTIFIER, identifier))
                 identifier = ""
