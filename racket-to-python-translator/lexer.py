@@ -199,6 +199,9 @@ class Lexer:
                     self.tokens.append(Token(TokenType.ROUND, identifier.upper()))
                 elif identifier.upper() == "CEIL":
                     self.tokens.append(Token(TokenType.CEIL, identifier.upper()))
+                elif identifier.upper() == "DISPLAY":
+                    self.tokens.append(Token(TokenType.DISPLAY, identifier.upper()))
+
                 else:
                     self.tokens.append(Token(TokenType.IDENTIFIER, identifier))
                 identifier = ""

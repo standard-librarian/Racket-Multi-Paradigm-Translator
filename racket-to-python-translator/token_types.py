@@ -9,6 +9,7 @@ class TokenType(Enum):
     LBRACKET = "["
     RBRACKET = "]"
     QUOTE = "'"
+    DOUBLE_QUOTE = '"'
     STRING = "STRING"
     NUMBER = "NUMBER"
     IDENTIFIER = "IDENTIFIER"
@@ -56,6 +57,7 @@ class TokenType(Enum):
     MAKE_LIST = "MAKE_LIST"
     VALUES = "VALUES"
     RANGE = "RANGE"
+    DISPLAY = "DISPLAY"
 
 
 class IdentifierType(Enum):

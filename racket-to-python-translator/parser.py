@@ -66,6 +66,14 @@ class Parser:
         tok_type = self.current_tok.type
         if tok_type == TokenType.IDENTIFIER:
             return self.identifier_expr()
+        elif tok_type == TokenType.DOUBLE_QUOTE:
+            token = self.current_tok
+            self.advance()
+            return StringNode(token)
+        elif tok_type == TokenType.QUOTE:
+            token = self.current_tok
+            self.advance()
+            return StringNode(token)
         elif self.current_tok.type == TokenType.STRING:
             token = self.current_tok
             self.advance()
@@ -212,6 +220,12 @@ class Parser:
             token = self.current_tok
             self.advance()
             return CommentNode(token.value)
+        elif tok_type == TokenType.DISPLAY:
+            token = self.current_tok
+            self.advance()
+            expr = self.expr()
+            return DisplayNode(expr)
+
         else:
             # Handle syntax errors or unsupported expressions
             pass
@@ -220,10 +234,6 @@ class Parser:
         token = self.current_tok
         self.advance()
 
-        if token.value == "display":
-            self.advance()
-            expr = self.expr()
-            return DisplayNode(expr)
         if token.value in user_defined_identifiers:
             identifier_type, value = user_defined_identifiers[token.value]
             if identifier_type == IdentifierType.FUNCTION:
