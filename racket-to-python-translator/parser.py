@@ -32,7 +32,9 @@ from .ast_nodes.round_node import RoundNode
 from .ast_nodes.ceil_node import CeilNode
 from .ast_nodes.floor_node import FloorNode
 from .ast_nodes.comment_node import CommentNode
+from .ast_nodes.unary_number_node import UnaryNumberNode
 from .token_types import TokenType, IdentifierType
+from .token import Token
 
 user_defined_identifiers = {}
 
@@ -42,6 +44,9 @@ class Parser:
         self.tokens = tokens
         self.tok_idx = -1
         self.advance()
+
+    def get_previous_token(self):
+        return self.tokens[self.tok_idx - 1]
 
     def advance(self):
         self.tok_idx += 1
@@ -73,13 +78,6 @@ class Parser:
             return self.let_expr()
         elif tok_type == TokenType.LAMBDA:
             return self.lambda_expr()
-        elif tok_type == TokenType.PLUS:
-            self.advance()
-            operands = []
-            while self.current_tok.type != TokenType.RPAREN:
-                expr = self.expr()
-                operands.append(expr)
-            return AddNode(operands)
 
         elif tok_type == TokenType.LESS:
             self.advance()
@@ -125,12 +123,34 @@ class Parser:
             return self.if_expr()
         elif tok_type == TokenType.COND:
             return self.cond_expr()
-        elif tok_type == TokenType.MINUS:
-            self.advance()
-            operands = []
-            while self.current_tok.type != TokenType.RPAREN:
-                operands.append(self.expr())
-            return SubNode(operands)
+        elif tok_type in {TokenType.PLUS, TokenType.MINUS}:
+            if self.get_previous_token().type == TokenType.LPAREN:
+                #  handle the case of a single negative number in parentheses
+
+                if tok_type == TokenType.MINUS:
+                    self.advance()
+                    operands = []
+                    while self.current_tok.type != TokenType.RPAREN:
+                        operands.append(self.expr())
+                    if len(operands) == 1:
+                        return UnaryNumberNode(Token(TokenType.MINUS, "-"), operands[0])
+                    return SubNode(operands)
+                elif tok_type == TokenType.PLUS:
+                    self.advance()
+                    operands = []
+                    while self.current_tok.type != TokenType.RPAREN:
+                        expr = self.expr()
+                        operands.append(expr)
+                    if len(operands) == 1:
+                        return UnaryNumberNode(Token(TokenType.PLUS, "+"), operands[0])
+                    return AddNode(operands)
+            else:
+                # Handle unary operators
+                current_token = self.current_tok
+                self.advance()
+                number = self.expr()
+                return UnaryNumberNode(current_token, number)
+
         elif tok_type == TokenType.MULTIPLY:
             self.advance()
             operands = []
