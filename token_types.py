@@ -28,7 +28,7 @@ class TokenType(Enum):
     GREATER_EQUAL = ">="
     NOT_EQUAL = "!="
     DEFINE = "DEFINE"
-    LET = "LET*"
+    LET = "LET"
     LAMBDA = "LAMBDA"
     IF = "IF"
     COND = "COND"
