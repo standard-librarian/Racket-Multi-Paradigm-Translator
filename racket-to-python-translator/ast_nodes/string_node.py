@@ -6,10 +6,10 @@ class StringNode(ASTNode):
         self.token = token
 
     def generate_python_code(self):
-        return repr(self.token.value)
+        return f'"{self.token.value}"'
 
     def __str__(self):
-        return f"String({self.token.value})"
+        return self.token.value
 
     def __repr__(self):
         return self.__str__()
