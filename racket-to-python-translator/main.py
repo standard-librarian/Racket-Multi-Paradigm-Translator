@@ -6,6 +6,14 @@ from .parser import Parser
 from .parse_tree_printer import print_parse_tree
 
 
+def test_multiple_lines(racket_lines: list):
+    lexer = Lexer()
+    python_code = ""
+    for line in racket_lines:
+        python_code += test_line(line) + "\n"
+    return python_code
+
+
 def test_line(racket_line: str):
     lexer = Lexer()
     tokens = lexer.tokenize_line(racket_line)
