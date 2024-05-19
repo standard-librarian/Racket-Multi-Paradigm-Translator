@@ -1,4 +1,4 @@
-from ast_nodes.ast_node import ASTNode
+from .ast_node import ASTNode
 
 class FloorNode(ASTNode):
     def __init__(self, elements):
