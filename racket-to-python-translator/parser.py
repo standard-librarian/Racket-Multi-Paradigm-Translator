@@ -62,7 +62,11 @@ class Parser:
         return self.current_tok
 
     def peek(self):
-        return self.tokens[self.tok_idx + 1]
+        return (
+            self.tokens[self.tok_idx + 1]
+            if self.tok_idx + 1 < len(self.tokens)
+            else None
+        )
 
     def parse(self):
         return self.expr()
@@ -74,7 +78,12 @@ class Parser:
         elif tok_type == TokenType.DOUBLE_QUOTE:
             token = self.current_tok
             self.advance()
-            return StringNode(token)
+            expr = self.expr()
+            self.advance()
+            if self.current_tok.type == TokenType.DOUBLE_QUOTE:
+                self.advance()
+            #   create a string node
+            return StringNode(token, expr)
         elif tok_type == TokenType.QUOTE:
             token = self.current_tok
             self.advance()
@@ -107,7 +116,20 @@ class Parser:
                 operands.append(expr)
             return MinNode(operands)
         elif tok_type == TokenType.LAMBDA:
-            return self.lambda_expr()
+            lamdba_expr = self.lambda_expr()
+            if (
+                self.peek() is not None
+                and self.peek().type == TokenType.LPAREN
+                or self.peek() is not None
+                and self.peek().type == TokenType.NUMBER
+            ):
+                self.advance()
+                operands = []
+                while self.current_tok.type != TokenType.RPAREN:
+                    operands.append(self.expr())
+                return FunctionCallNodeWithOperands(lamdba_expr, operands)
+
+            return lamdba_expr
 
         elif tok_type == TokenType.LESS:
             self.advance()
@@ -283,10 +305,29 @@ class Parser:
     def cond_expr(self):
         self.advance()  # Consume 'cond'
         cases = []
-        while self.current_tok.type != TokenType.RPAREN:
-            condition = self.expr()
-            expression = self.expr()
-            cases.append((condition, expression))
+        cases_exist = True
+        number_of_cases = 0
+        while cases_exist:
+            if self.current_tok.type == TokenType.LBRACKET:
+                number_of_cases += 1
+                self.advance()
+                condition = self.expr()
+                expression = self.expr()
+                cases.append((condition, expression))
+                if self.current_tok.type == TokenType.RBRACKET:
+                    self.advance()
+                    continue
+                if self.current_tok.type == TokenType.ELSE:
+                    self.advance()
+                    expression = self.expr()
+                    case_ = (None, expression)
+                    cases.append(case_)
+                    cases_exist = False
+
+            else:
+                cases_exist = False
+
+        self.advance()
         return CondNode(cases)
 
     def define_expr(self):

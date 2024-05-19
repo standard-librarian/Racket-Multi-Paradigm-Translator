@@ -39,7 +39,7 @@ class Lexer:
             while not self.is_eof() and self.peek().isdigit():
                 number += self.peek()
                 self.advance()
-        if not self.is_eof() and self.peek() == "/": #Handeling Fractions : 9/3
+        if not self.is_eof() and self.peek() == "/":  # Handeling Fractions : 9/3
             number += "/"
             fraction_flag = True
             self.advance()
@@ -51,6 +51,15 @@ class Lexer:
         elif fraction_flag:
             return Token(TokenType.NUMBER, number)
         return Token(TokenType.NUMBER, float(number))
+
+    def make_string(self):
+        string = ""
+        self.advance()
+        while not self.is_eof() and self.peek() != "'":
+            string += self.peek()
+            self.advance()
+        self.advance()
+        return Token(TokenType.STRING, string)
 
     def is_alpha(self, char):
         return char.isalpha()
@@ -119,8 +128,7 @@ class Lexer:
                 self.tokens.append(Token(TokenType.RBRACKET, char))
                 self.advance()
             elif char == "'":
-                self.tokens.append(Token(TokenType.QUOTE, char))
-                self.advance()
+                self.tokens.append(self.make_string())
             elif char == ".":
                 self.tokens.append(Token(TokenType.DOT, char))
                 self.advance()
