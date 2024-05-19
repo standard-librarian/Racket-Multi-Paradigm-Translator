@@ -10,4 +10,4 @@ class FilterNode(ASTNode):
         return f"FilterNode(predicate={self.predicate}, lst={self.lst})"
 
     def generate_python_code(self):
-        return f"filter({self.predicate.generate_python_code()}, {self.lst.generate_python_code()})"
+        return f"list(filter({self.predicate.generate_python_code()}, {self.lst.generate_python_code()}))"
