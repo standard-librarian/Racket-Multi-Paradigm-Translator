@@ -28,6 +28,7 @@ from .ast_nodes.ormap_node import OrmapNode
 from .ast_nodes.andmap_node import AndmapNode
 from .ast_nodes.foldl_node import FoldlNode
 from .ast_nodes.filter_node import FilterNode
+from .ast_nodes.predicate_node import PredicateNode
 from .ast_nodes.sqrt_node import SqrtNode
 from .ast_nodes.abs_node import AbsNode
 from .ast_nodes.sin_node import SinNode
@@ -271,6 +272,9 @@ class Parser:
         token = self.current_tok
         self.advance()
 
+        if token.value.endswith('?'):
+            return self.predicate_expr(token.value)
+
         if token.value in user_defined_identifiers:
             identifier_type, value = user_defined_identifiers[token.value]
             if identifier_type == IdentifierType.FUNCTION:
@@ -446,6 +450,13 @@ class Parser:
         self.advance()
         expr = self.expr()
         return LambdaNode(params, expr)
+
+    def predicate_expr(self, predicate):
+        values = []
+        while self.current_tok.type != TokenType.RPAREN:
+            values.append(self.expr())
+        self.advance()  # Skip ')'
+        return PredicateNode(predicate, values)
 
     def sqrt_expr(self):
         # ( sqrt expr )
