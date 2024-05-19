@@ -52,9 +52,14 @@ class Parser:
         self.tokens = tokens
         self.tok_idx = -1
         self.advance()
+        # found foldl followed by a lambda expression
+        self.found_foldl_lambda = False
 
     def get_previous_token(self):
         return self.tokens[self.tok_idx - 1]
+
+    def get_token_at_position(self, position):
+        return self.tokens[position]
 
     def advance(self):
         self.tok_idx += 1
@@ -117,7 +122,12 @@ class Parser:
                 operands.append(expr)
             return MinNode(operands)
         elif tok_type == TokenType.LAMBDA:
+            current_index = self.tok_idx
             lamdba_expr = self.lambda_expr()
+            if self.found_foldl_lambda:
+                self.found_foldl_lambda = False
+                return lamdba_expr
+
             if (
                 self.peek() is not None
                 and self.peek().type == TokenType.LPAREN
@@ -272,7 +282,7 @@ class Parser:
         token = self.current_tok
         self.advance()
 
-        if token.value.endswith('?'):
+        if token.value.endswith("?"):
             return self.predicate_expr(token.value)
 
         if token.value in user_defined_identifiers:
@@ -427,6 +437,8 @@ class Parser:
 
     def foldl_expr(self):
         self.advance()  # Skip 'foldl'
+        if self.peek().type == TokenType.LAMBDA:
+            self.found_foldl_lambda = True
         func = self.expr()  # Parse the function
         init_val = self.expr()  # Parse the initial value
         lst = self.expr()  # Parse the list
