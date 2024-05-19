@@ -37,7 +37,7 @@ def print_parse_tree(node, indent="", last_child=True, label=None):
         tree_representation += type(node).__name__ + "\n"
         node_info = ""
     else:
-        if isinstance(node, (str, int)):
+        if isinstance(node, (str, int, float)):
             node_info = f"{branch_symbol}{node}"
         else:
             node_info = f"{branch_symbol}{type(node).__name__}"
@@ -57,6 +57,8 @@ def print_parse_tree(node, indent="", last_child=True, label=None):
         ]
     elif isinstance(node, NumberNode):
         child_nodes = [node.value]
+    elif isinstance(node, CommentNode):
+        child_nodes = [node.comment]
     elif isinstance(node, IdentifierNode):
         child_nodes = [node.token.value]
     elif isinstance(node, ListNodes):

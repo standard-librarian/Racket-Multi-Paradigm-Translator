@@ -1,6 +1,11 @@
 import sys
 import os
-
+import argparse
+import google.generativeai as genai
+import graphviz
+GOOGLE_API_KEY = 'AIzaSyC9vl1ZmmDg9kQ-g7sAuYCM6FhjvuBzOnI'
+genai.configure(api_key=GOOGLE_API_KEY)
+model = genai.GenerativeModel('gemini-pro')
 from .lexer import Lexer
 from .parser import Parser
 from .parse_tree_printer import print_parse_tree
@@ -17,8 +22,8 @@ def test_line(racket_line: str):
     return python_code
 
 
-def main(filename=None):
-    lexer = Lexer()
+def main(filename=None, ai=None):
+    lexer = Lexer()        
     if filename:
         with open("parse_tree.txt", "w") as file:
             file.write("")
@@ -46,6 +51,7 @@ all_le = all_binary_func(operator.le) # <=
 """
             )
         with open(filename, "r") as file:
+            ai_text = ""
             for line in file:
                 tokens = lexer.tokenize_line(line)
                 parser = Parser(tokens)
@@ -57,9 +63,27 @@ all_le = all_binary_func(operator.le) # <=
                         file.write(python_code + "\n")
                     with open("parse_tree.txt", "a") as file:
                         file.write("\n" + line + "\n" + tree)
-                        file.write(
-                            "*******************************************************"
-                        )
+                        ai_text += "\n" + tree
+
+            if ast and ai:
+                book1 = "Compiler Principles, Techniques, & Tools, Second edition, Jeffery D. Ullman, Alfred V. Aho, Monica S. Lam, and Ravi Sethi, 2006"
+                book2 = "Engineering a Compiler, Keith Cooper, Linda Torczon, second edition, 2011"
+                book3 = "Modern Compiler Implementation in Java, Second Edition, Andrew W. Appel and Jens Palsberg"
+                prompt=f"Take a deep breath and act as an Academic Professor teaching these books ${book1}, ${book2}, ${book3} Compilers course and convert the following structure to DOT format, it should look like a SCIENTIFIC COMPILER PARSE TREE, Follow these instructions: 1- Make sure it doesn't have any syntax errors and match all DOT restricitions, output will be directly used into graphviz.Source in python. 2- Make sure that each node has only 1 parent. Here's the reperesntation:\n{ai_text}",
+                response = model.generate_content(prompt)
+                dot_output = ""
+                parts = response.candidates[0].content.parts
+                for part in parts:
+                    dot_output += part.text
+                cleaned_dot_output = dot_output.replace("```", "")
+                cleaned_dot_output = cleaned_dot_output.replace("DOT" , "")
+                cleaned_dot_output = cleaned_dot_output.replace("dot", "")
+                cleaned_dot_output = cleaned_dot_output.replace("python", "")
+
+                print(cleaned_dot_output)
+                graph = graphviz.Source(cleaned_dot_output)
+                graph.render('output_graph', format='png', cleanup=True)
+                graph.view()
 
     else:
         while True:
@@ -77,7 +101,10 @@ all_le = all_binary_func(operator.le) # <=
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        main(sys.argv[1])
-    else:
-        main()
+    parser = argparse.ArgumentParser(description='Example usage: python3 -m racket-to-python-translator -rkt code.rkt -ai')
+    parser.add_argument('-code', type=str, help='File name that contains racket code "code.rkt" for example', default=None)
+    parser.add_argument('-ai', action='store_true', help='Use this arguemnt to activate AI enhancemnet')
+    args = parser.parse_args()
+    ai = args.ai
+    file = args.code
+    main(file, ai)
