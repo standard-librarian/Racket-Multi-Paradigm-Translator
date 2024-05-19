@@ -31,7 +31,7 @@ class LambdaExpressionTest(unittest.TestCase):
         self.assertEqual(test_line("(lambda () 1)"), "lambda : 1")
 
     def test_lambda_with_no_parameters_and_returning_string(self):
-        self.assertEqual(test_line('(lambda () "hello")'), "lambda : 'hello'")
+        self.assertEqual(test_line('(lambda () "hello")'), 'lambda : "hello"')
 
     def test_lambda_with_define_then_use_variable(self):
         self.assertEqual(
