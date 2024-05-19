@@ -1,34 +1,44 @@
 
-(> 1 2 (< 3 4 (= 5 (+ 4 (>= 3 4 (<= 99 -0.34)))) 6 7))
+(define average (lambda (lst) (/ (foldl (lambda (x y) (+ x y)) 0 lst) (length lst))))
 
-GreaterNode
-    ├── LessNode
-    │   ├── NumberNode
-    │   │   └── 7
-    │   ├── NumberNode
-    │   │   └── 6
-    │   ├── EqualNode
-    │   │   ├── AddNode
-    │   │   │   ├── GreaterEqualNode
-    │   │   │   │   ├── LessEqualNode
-    │   │   │   │   │   ├── UnaryNumberNode
-    │   │   │   │   │   │   └── NumberNode
-    │   │   │   │   │   │       └── 0.34
-    │   │   │   │   │   └── NumberNode
-    │   │   │   │   │       └── 99
-    │   │   │   │   ├── NumberNode
-    │   │   │   │   │   └── 4
-    │   │   │   │   └── NumberNode
-    │   │   │   │       └── 3
-    │   │   │   └── NumberNode
-    │   │   │       └── 4
-    │   │   └── NumberNode
-    │   │       └── 5
-    │   ├── NumberNode
-    │   │   └── 4
-    │   └── NumberNode
-    │       └── 3
-    ├── NumberNode
-    │   └── 2
-    └── NumberNode
-        └── 1
+DefineNode
+    ├── IdentifierNode
+    │   └── average
+    └── LambdaNode
+        └── PARAMS
+            └── IdentifierNode
+                └── lst
+        └── EXPRESSION
+            └── DivNode
+                ├── IdentifierNode
+                │   └── lst
+                ├── IdentifierNode
+                │   └── length
+                └── FoldlNode
+                    ├── IdentifierNode
+                    │   └── lst
+                    ├── NumberNode
+                    │   └── 0
+                    └── LambdaNode
+                        ├── PARAMS
+                        │   ├── IdentifierNode
+                        │   │   └── x
+                        └── IdentifierNode
+                            └── y
+                        └── EXPRESSION
+                            └── AddNode
+                                ├── IdentifierNode
+                                │   └── y
+                                └── IdentifierNode
+                                    └── x
+
+(display (average (list 1 2 3)))
+DisplayNode
+    └── FunctionCallNodeWithOperands
+        └── ListNodes
+            ├── NumberNode
+            │   └── 3
+            ├── NumberNode
+            │   └── 2
+            └── NumberNode
+                └── 1

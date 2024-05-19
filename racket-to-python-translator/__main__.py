@@ -96,7 +96,6 @@ all_le = all_binary_func(operator.le) # <=
             ast = parser.parse()
             if ast:
                 python_code = ast.generate_python_code()
-                print(python_code)
                 print(print_parse_tree(ast))
 
 

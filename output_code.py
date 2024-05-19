@@ -15,4 +15,5 @@ all_ge = all_binary_func(operator.ge) # >=
 all_lt = all_binary_func(operator.lt) # <
 all_le = all_binary_func(operator.le) # <=
 
-all_gt((1, 2, all_lt((3, 4, all_eq((5, add_all((4, all_ge((3, 4, all_le((99, -0.34)))))))), 6, 7))))
+average = lambda lst: div_all((functools.reduce(lambda x, y: add_all((x, y)), lst, 0), length, lst))
+print(average(list((1, 2, 3))))

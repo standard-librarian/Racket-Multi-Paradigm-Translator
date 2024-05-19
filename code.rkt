@@ -1,1 +1,2 @@
-(> 1 2 (< 3 4 (= 5 (+ 4 (>= 3 4 (<= 99 -0.34)))) 6 7))
+(define average (lambda (lst) (/ (foldl (lambda (x y) (+ x y)) 0 lst) (length lst))))
+(display (average (list 1 2 3)))

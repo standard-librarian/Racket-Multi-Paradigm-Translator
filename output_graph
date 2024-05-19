@@ -1,41 +1,77 @@
 
-graph {
-    GreaterNode [label="GreaterNode"]
-    LessNode [label="LessNode"]
-    NumberNode7 [label="NumberNode"]
-    NumberNode6 [label="NumberNode"]
-    EqualNode [label="EqualNode"]
-    AddNode [label="AddNode"]
-    GreaterEqualNode [label="GreaterEqualNode"]
-    LessEqualNode [label="LessEqualNode"]
-    UnaryNumberNode [label="UnaryNumberNode"]
-    NumberNode0_34 [label="NumberNode"]
-    NumberNode99 [label="NumberNode"]
-    NumberNode4 [label="NumberNode"]
-    NumberNode3 [label="NumberNode"]
-    NumberNode4_2 [label="NumberNode"]
-    NumberNode5 [label="NumberNode"]
-    NumberNode4_3 [label="NumberNode"]
-    NumberNode3_2 [label="NumberNode"]
-    NumberNode2 [label="NumberNode"]
-    NumberNode1 [label="NumberNode"]
+digraph compiler {
+    subgraph cluster_DefineNode {
+        style=filled;
+        color=lightgrey;
+        node [style=filled,color=white];
+        DefineNode [label="DefineNode"];
+        IdentifierNode_average [label="IdentifierNode\naverage"];
+        LambdaNode [label="LambdaNode"];
+    }
 
-    GreaterNode -- LessNode
-    LessNode -- NumberNode7
-    LessNode -- NumberNode6
-    LessNode -- EqualNode
-    EqualNode -- AddNode
-    AddNode -- GreaterEqualNode
-    AddNode -- NumberNode3
-    GreaterEqualNode -- LessEqualNode
-    LessEqualNode -- UnaryNumberNode
-    LessEqualNode -- NumberNode99
-    UnaryNumberNode -- NumberNode0_34
-    GreaterEqualNode -- NumberNode4
-    NumberNode3 -- NumberNode4_2
-    NumberNode3 -- NumberNode5
-    LessNode -- NumberNode4_3
-    LessNode -- NumberNode3_2
-    GreaterNode -- NumberNode2
-    GreaterNode -- NumberNode1
+    subgraph cluster_LambdaNode {
+        style=filled;
+        color=lightgrey;
+        node [style=filled,color=white];
+        PARAMS [label="PARAMS"];
+        IdentifierNode_lst [label="IdentifierNode\nlst"];
+        EXPRESSION [label="EXPRESSION"];
+        DivNode [label="DivNode"];
+        IdentifierNode_lst_in_div [label="IdentifierNode\nlst"];
+        IdentifierNode_length [label="IdentifierNode\nlength"];
+        FoldlNode [label="FoldlNode"];
+        IdentifierNode_lst_in_foldl [label="IdentifierNode\nlst"];
+        NumberNode_0 [label="NumberNode\n0"];
+        LambdaNode [label="LambdaNode"];
+    }
+
+    subgraph cluster_LambdaNode_in_FoldlNode {
+        style=filled;
+        color=lightgrey;
+        node [style=filled,color=white];
+        PARAMS [label="PARAMS"];
+        IdentifierNode_x [label="IdentifierNode\nx"];
+        IdentifierNode_y [label="IdentifierNode\ny"];
+        EXPRESSION [label="EXPRESSION"];
+        AddNode [label="AddNode"];
+        IdentifierNode_y_in_add [label="IdentifierNode\ny"];
+        IdentifierNode_x_in_add [label="IdentifierNode\nx"];
+    }
+
+    subgraph cluster_DisplayNode {
+        style=filled;
+        color=lightgrey;
+        node [style=filled,color=white];
+        DisplayNode [label="DisplayNode"];
+        FunctionCallNodeWithOperands [label="FunctionCallNodeWithOperands"];
+        ListNodes [label="ListNodes"];
+        NumberNode_3 [label="NumberNode\n3"];
+        NumberNode_2 [label="NumberNode\n2"];
+        NumberNode_1 [label="NumberNode\n1"];
+    }
+
+    DefineNode -> IdentifierNode_average;
+    DefineNode -> LambdaNode;
+    LambdaNode -> PARAMS;
+    PARAMS -> IdentifierNode_lst;
+    LambdaNode -> EXPRESSION;
+    EXPRESSION -> DivNode;
+    DivNode -> IdentifierNode_lst_in_div;
+    DivNode -> IdentifierNode_length;
+    DivNode -> FoldlNode;
+    FoldlNode -> IdentifierNode_lst_in_foldl;
+    FoldlNode -> NumberNode_0;
+    FoldlNode -> LambdaNode;
+    LambdaNode -> PARAMS;
+    PARAMS -> IdentifierNode_x;
+    PARAMS -> IdentifierNode_y;
+    LambdaNode -> EXPRESSION;
+    EXPRESSION -> AddNode;
+    AddNode -> IdentifierNode_y_in_add;
+    AddNode -> IdentifierNode_x_in_add;
+    DisplayNode -> FunctionCallNodeWithOperands;
+    FunctionCallNodeWithOperands -> ListNodes;
+    ListNodes -> NumberNode_3;
+    ListNodes -> NumberNode_2;
+    ListNodes -> NumberNode_1;
 }
