@@ -23,6 +23,11 @@ from .ast_nodes.build_list_node import BuildListNode
 from .ast_nodes.make_list_node import MakeListNode
 from .ast_nodes.values_node import ValuesNode
 from .ast_nodes.range_node import RangeNode
+from .ast_nodes.map_node import MapNode
+from .ast_nodes.ormap_node import OrmapNode
+from .ast_nodes.andmap_node import AndmapNode
+from .ast_nodes.foldl_node import FoldlNode
+from .ast_nodes.filter_node import FilterNode
 from .ast_nodes.sqrt_node import SqrtNode
 from .ast_nodes.abs_node import AbsNode
 from .ast_nodes.sin_node import SinNode
@@ -222,6 +227,16 @@ class Parser:
             return self.values_expr()
         elif tok_type == TokenType.RANGE:
             return self.range_expr()
+        elif tok_type == TokenType.MAP:
+            return self.map_expr()
+        elif tok_type == TokenType.ORMAP:
+            return self.ormap_expr()
+        elif tok_type == TokenType.ANDMAP:
+            return self.andmap_expr()
+        elif tok_type == TokenType.FOLDL:
+            return self.foldl_expr()
+        elif tok_type == TokenType.FILTER:
+            return self.filter_expr()
         elif tok_type == TokenType.SQRT:
             return self.sqrt_expr()
         elif tok_type == TokenType.ABS:
@@ -384,6 +399,42 @@ class Parser:
             step = None
         self.advance()  # Skip ')'
         return RangeNode(start, end, step)
+
+    def map_expr(self):
+        self.advance()  # Skip 'map'
+        func = self.expr()  # Parse the function
+        lst = self.expr()
+        self.advance()  # Skip ')'
+        return MapNode(func, lst)
+
+    def andmap_expr(self):
+        self.advance()  # Skip 'andmap'
+        func = self.expr()  # Parse the function
+        lst = self.expr()  # Parse the list
+        self.advance()  # Skip ')'
+        return AndmapNode(func, lst)
+
+    def ormap_expr(self):
+        self.advance()  # Skip 'ormap'
+        func = self.expr()  # Parse the function
+        lst = self.expr()  # Parse the list
+        self.advance()  # Skip ')'
+        return OrmapNode(func, lst)
+
+    def foldl_expr(self):
+        self.advance()  # Skip 'foldl'
+        func = self.expr()  # Parse the function
+        init_val = self.expr()  # Parse the initial value
+        lst = self.expr()  # Parse the list
+        self.advance()  # Skip ')'
+        return FoldlNode(func, init_val, lst)
+
+    def filter_expr(self):
+        self.advance()  # Skip 'filter'
+        predicate = self.expr()  # Parse the predicate function
+        lst = self.expr()  # Parse the list
+        self.advance()  # Skip ')'
+        return FilterNode(predicate, lst)
 
     def lambda_expr(self):
         self.advance()

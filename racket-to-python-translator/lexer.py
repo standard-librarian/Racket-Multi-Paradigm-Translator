@@ -219,6 +219,17 @@ class Lexer:
                     self.tokens.append(Token(TokenType.CEIL, identifier.upper()))
                 elif identifier.upper() == "DISPLAY":
                     self.tokens.append(Token(TokenType.DISPLAY, identifier.upper()))
+                elif identifier.upper() == "MAP":
+                    self.tokens.append(Token(TokenType.MAP, identifier.upper()))
+                elif identifier.upper() == "FOLDL":
+                    self.tokens.append(Token(TokenType.FOLDL, identifier.upper()))
+                elif identifier.upper() == "ANDMAP":
+                    self.tokens.append(Token(TokenType.ANDMAP, identifier.upper()))
+                elif identifier.upper() == "ORMAP":
+                    self.tokens.append(Token(TokenType.ORMAP, identifier.upper()))
+                elif identifier.upper() == "FILTER":
+                    self.tokens.append(Token(TokenType.FILTER, identifier.upper()))
+
 
                 else:
                     self.tokens.append(Token(TokenType.IDENTIFIER, identifier))

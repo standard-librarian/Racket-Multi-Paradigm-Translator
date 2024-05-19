@@ -49,8 +49,6 @@ class TokenType(Enum):
     FLOOR = "FLOOR"
     ROUND = "ROUND"
     CEIL = "CEIL"
-    MAP = "MAP"
-    FOLDL = "FOLDL"
     WRITELN = "WRITELN"
     LIST = "LIST"
     BUILD_LIST = "BUILD-LIST"
@@ -58,6 +56,11 @@ class TokenType(Enum):
     VALUES = "VALUES"
     RANGE = "RANGE"
     DISPLAY = "DISPLAY"
+    MAP = "MAP"
+    ORMAP = "ORMAP"
+    ANDMAP = "ANDMAP"
+    FOLDL = "FOLDL"
+    FILTER = "FILTER"
 
 
 class IdentifierType(Enum):
