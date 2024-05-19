@@ -1,6 +1,5 @@
 import sys
 import os
-
 from .lexer import Lexer
 from .parser import Parser
 from .parse_tree_printer import print_parse_tree
