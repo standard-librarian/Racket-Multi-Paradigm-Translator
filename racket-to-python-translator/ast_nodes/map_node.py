@@ -11,4 +11,4 @@ class MapNode(ASTNode):
 
     def generate_python_code(self):
         lst_code = self.lst.generate_python_code()
-        return f"map({self.func.generate_python_code()}, {lst_code})"
+        return f"list(map({self.func.generate_python_code()}, {lst_code}))"
