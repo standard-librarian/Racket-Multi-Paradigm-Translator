@@ -11,7 +11,7 @@ class VariableDefintionTest(unittest.TestCase):
         self.assertEqual(test_line("(define a 1)"), "a = 1")
 
     def test_basic_variable_definition_with_string(self):
-        self.assertEqual(test_line('(define a "hello")'), "a = 'hello'")
+        self.assertEqual(test_line('(define a "hello")'), 'a = "hello"')
 
     def test_basic_variable_definition_with_list(self):
         self.assertEqual(test_line("(define a (list 1 2 3))"), "a = list((1, 2, 3))")
@@ -19,7 +19,7 @@ class VariableDefintionTest(unittest.TestCase):
     def test_basic_variable_definition_with_list_of_strings(self):
         self.assertEqual(
             test_line('(define a (list "hello" "world"))'),
-            "a = list(('hello', 'world'))",
+            'a = list(("hello", "world"))',
         )
 
     def test_basic_variable_definition_with_list_of_lists(self):
@@ -33,5 +33,5 @@ class VariableDefintionTest(unittest.TestCase):
             test_line(
                 '(define a (list (list "hello" "world") (list "goodbye" "world")))'
             ),
-            "a = list((list(('hello', 'world')), list(('goodbye', 'world'))))",
+            'a = list((list(("hello", "world")), list(("goodbye", "world"))))',
         )
