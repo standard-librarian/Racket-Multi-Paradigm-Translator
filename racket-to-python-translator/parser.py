@@ -23,6 +23,12 @@ from .ast_nodes.build_list_node import BuildListNode
 from .ast_nodes.make_list_node import MakeListNode
 from .ast_nodes.values_node import ValuesNode
 from .ast_nodes.range_node import RangeNode
+from .ast_nodes.map_node import MapNode
+from .ast_nodes.ormap_node import OrmapNode
+from .ast_nodes.andmap_node import AndmapNode
+from .ast_nodes.foldl_node import FoldlNode
+from .ast_nodes.filter_node import FilterNode
+from .ast_nodes.predicate_node import PredicateNode
 from .ast_nodes.sqrt_node import SqrtNode
 from .ast_nodes.abs_node import AbsNode
 from .ast_nodes.sin_node import SinNode
@@ -46,9 +52,14 @@ class Parser:
         self.tokens = tokens
         self.tok_idx = -1
         self.advance()
+        # found foldl followed by a lambda expression
+        self.found_foldl_lambda = False
 
     def get_previous_token(self):
         return self.tokens[self.tok_idx - 1]
+
+    def get_token_at_position(self, position):
+        return self.tokens[position]
 
     def advance(self):
         self.tok_idx += 1
@@ -111,7 +122,12 @@ class Parser:
                 operands.append(expr)
             return MinNode(operands)
         elif tok_type == TokenType.LAMBDA:
+            current_index = self.tok_idx
             lamdba_expr = self.lambda_expr()
+            if self.found_foldl_lambda:
+                self.found_foldl_lambda = False
+                return lamdba_expr
+
             if (
                 self.peek() is not None
                 and self.peek().type == TokenType.LPAREN
@@ -222,6 +238,16 @@ class Parser:
             return self.values_expr()
         elif tok_type == TokenType.RANGE:
             return self.range_expr()
+        elif tok_type == TokenType.MAP:
+            return self.map_expr()
+        elif tok_type == TokenType.ORMAP:
+            return self.ormap_expr()
+        elif tok_type == TokenType.ANDMAP:
+            return self.andmap_expr()
+        elif tok_type == TokenType.FOLDL:
+            return self.foldl_expr()
+        elif tok_type == TokenType.FILTER:
+            return self.filter_expr()
         elif tok_type == TokenType.SQRT:
             return self.sqrt_expr()
         elif tok_type == TokenType.ABS:
@@ -255,6 +281,9 @@ class Parser:
     def identifier_expr(self):
         token = self.current_tok
         self.advance()
+
+        if token.value.endswith("?"):
+            return self.predicate_expr(token.value)
 
         if token.value in user_defined_identifiers:
             identifier_type, value = user_defined_identifiers[token.value]
@@ -385,6 +414,44 @@ class Parser:
         self.advance()  # Skip ')'
         return RangeNode(start, end, step)
 
+    def map_expr(self):
+        self.advance()  # Skip 'map'
+        func = self.expr()  # Parse the function
+        lst = self.expr()
+        self.advance()  # Skip ')'
+        return MapNode(func, lst)
+
+    def andmap_expr(self):
+        self.advance()  # Skip 'andmap'
+        func = self.expr()  # Parse the function
+        lst = self.expr()  # Parse the list
+        self.advance()  # Skip ')'
+        return AndmapNode(func, lst)
+
+    def ormap_expr(self):
+        self.advance()  # Skip 'ormap'
+        func = self.expr()  # Parse the function
+        lst = self.expr()  # Parse the list
+        self.advance()  # Skip ')'
+        return OrmapNode(func, lst)
+
+    def foldl_expr(self):
+        self.advance()  # Skip 'foldl'
+        if self.peek().type == TokenType.LAMBDA:
+            self.found_foldl_lambda = True
+        func = self.expr()  # Parse the function
+        init_val = self.expr()  # Parse the initial value
+        lst = self.expr()  # Parse the list
+        self.advance()  # Skip ')'
+        return FoldlNode(func, init_val, lst)
+
+    def filter_expr(self):
+        self.advance()  # Skip 'filter'
+        predicate = self.expr()  # Parse the predicate function
+        lst = self.expr()  # Parse the list
+        self.advance()  # Skip ')'
+        return FilterNode(predicate, lst)
+
     def lambda_expr(self):
         self.advance()
         self.advance()
@@ -395,6 +462,13 @@ class Parser:
         self.advance()
         expr = self.expr()
         return LambdaNode(params, expr)
+
+    def predicate_expr(self, predicate):
+        values = []
+        while self.current_tok.type != TokenType.RPAREN:
+            values.append(self.expr())
+        self.advance()  # Skip ')'
+        return PredicateNode(predicate, values)
 
     def sqrt_expr(self):
         # ( sqrt expr )
